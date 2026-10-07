@@ -1,0 +1,4 @@
+output/_build/node/
+__pycache__/
+*.pyc
+*.tmp

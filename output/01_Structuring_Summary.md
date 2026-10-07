@@ -1,53 +1,45 @@
-# 01 Structuring Summary (INTERNAL, Phase 2 checkpoint)
+# 01 Structuring Summary (INTERNAL, revised for your decisions)
 
-Projection only. EGP million. Numbers from `01_Structuring_Analysis.xlsx` (model rebuilt quarterly; ties to model net cash flow GS 375.4 / LA **595.3** and NPV 215.3 / 307.5). Assumptions are tagged in the workbook (`Assumptions_Log`). Three model problems change the recommendation; read section 1 first.
+Projection only. EGP million. Detail: `01_Structuring_Analysis.xlsx`; every pack Financial Annex recomputes these numbers with live formulas and reconciles to the source model (GS net 375.4 / NPV 215.3; LA net 595.3 / NPV 307.5).
 
-## 1. What drives the recommendation
-1. **Returns are below the risk-free alternative.** Both options deliver about 16-17.5% IRR in EGP at the terms you set. The CBE overnight deposit rate is 19%. Expect investors to say so.
-2. **Delivery payments are collected before handover** (GS M30-36 vs handover M48; LA M39-45 vs M54). If they arrive at handover, peak funding is GS 269 / LA 244, not 102 (NPV 155 / 275). A 12-month sales delay with prices -10% takes peak funding to GS 441 / LA 849. No ticket covers that; a sponsor commitment must be shown.
-3. **L'avenir is 595.3 net, not 642** (SUM-range error, 46.4 of cost dropped from its summary). I used 595.3.
+## Applied from your decisions
+Retained units untouched; units at **launch list** (GS retail 225 / offices 135; LA 250 / 160 EGP thousand per m2) with face value 2.0x; cash 2.3x; nothing ring-fenced; Jalour bears the landlord 35%; Jalour covers project funding gaps; no return guarantee; discount rate 14%; other projects in the source workbook ignored.
 
-## 2. Funding plan and the 125M ticket
-Uses at peak: GS 113.0 = down payment 80 + guarantee/working capital 22.5 + pre-construction 10.5 (assumption). LA 112.5 = 85 + 17.0 + 10.5. Modelled peak 102.5 / 102.0.
-
-| Ticket | 50 | 75 | 100 | 125 |
-|---|---|---|---|---|
-| % of modelled peak | 49% | 73% | 98% | **122%** |
-| Balance (sponsor equity, collections, other sources) | 63.0 / 62.5 | 38.0 / 37.5 | 13.0 / 12.5 | 0 |
-| Excess over uses | 0 | 0 | 0 | 12.0 / 12.5 |
-
-(GS / LA.) 125M exceeds the modelled peak by 22.5 / 23.0. **Recommended use:** a ring-fenced completion and collections-timing reserve, released against milestones, remainder at handover; under Option B it doubles as payout reserve. It is not idle in the stress case (peak 269 / 244). Cost to Jalour: with escrow release on drawn funds only, the Option A cost of capital rises from 16.2% to 17.6% (GS) and 17.3% to 19.4% (LA) at 125M. The ticket also does not stop the downside gap, so a 125M ticket buys no extra protection against delay.
-
-## 3. Option A (units, 2.0x)
-**Recommend: units from the retained 20% pool, pro rata retail/office, Jalour bears the landlord's 35% (as already modelled).** This leaves modelled collections, the guarantee schedule and the peak shortage untouched (the retained units are outside the model's cash flows) and needs no landlord price concession. Pool use at 50/75/100/125: GS 18/27/36/44%, LA 15/22/30/37%. Retail-only breaks above about 116M (GS) / 135M (LA); offices-only fits.
-
-| Per 100M ticket (GS / LA) | Investor IRR / MOIC | Jalour cost of capital | NPV to Jalour @14% |
-|---|---|---|---|
-| **Retained, Jalour bears** | 16.4% / 17.5%, 1.94x | 16.1% / 17.2% | -8.0 / -10.4 |
-| Retained, landlord waives | same | 7.2% / 7.0% | +17.6 / +15.9 |
-| Sold programme, Jalour bears | same | 22.5% / 23.4% | -23.4 / -23.0 (peak shortage 111 / 129) |
-| Sold programme, landlord waives | same | 12.6% / 11.8% | +2.2 / +3.3 |
-
-Investor cases (GS / LA): downside (resale +12m, price -10%) 10.9% / 11.5%, 1.75x; upside (+10%) 18.9% / 20.2%, 2.13x. Returns are identical per EGP at every ticket.
-- **Face value basis is your decision.** At model average price (my base) 2.0x gives the returns above. At launch list price the same 2.0x is worth about 2.6x (GS) / 3.0x (LA) of area at average prices: investor IRR about 24% / 30%, and Jalour's cost the same. To reach about 20% on the average-price basis you need about 2.25x.
-- **Day-one holding and liquidity.** Units do not exist until M48 / M54. Day one is a registered allocation with an assignable contract. Realistic resale: after Jalour and landlord consent, at a discount (a 20% discount at month 24 still gives about 25% IRR; 30% about 17%). Base case assumes sales after handover. Landlord consent is needed for any allocation and for release of its interest in the retained units (its 35% is settled only in years 8-10).
-
-## 4. Option B (cash, 24m grace, 12 quarterly payout slots)
-**Return: 1.75x total** gives IRR parity with Option A (investor 16.5-17.4% GS, 16.4-17.2% LA; Jalour cost equal). 1.9x gives 19.8%.
-
-| Structure (base) | GS | LA |
+## Option A: units (2.0x at launch list, from the first two sales tranches)
+| Per ticket 100 | Green Square | L'avenir |
 |---|---|---|
-| S1 fixed, equal instalments | Fails: 8 of 12 quarters below 1.5x at 100M (9 at 125M) | Fails: 3 of 12 |
-| S2 % of collections, floor 0.4x / cap 1.5x of instalment | Fails (8 of 12). Share 9.4 / 14.1 / 18.8 / 23.5% at 50/75/100/125 | Fails (3 of 12). Share 7.5 / 11.3 / 15.0 / 18.8% |
-| S3 hybrid, fixed 1.35x + share, cap 2.0x | Fails (8 of 12). Share 1.4 / 2.1 / 2.8 / 3.5% | Fails (3 of 12). Share 1.2 / 1.7 / 2.3 / 2.9% |
-| **S4 coverage-gated fixed multiple** | Passes only if retained-unit sale proceeds are swept to the payout account (min 2.5x / 1.6x / 5.2x / 4.2x); on model net cash flow alone 4 of 7-8 quarters fail | Passes on model cash flow alone up to 100M (min 2.9x / 2.0x / 1.6x); 125M needs the sweep (1.5x) |
+| Units face value / value at final list | 200 / 287 | 200 / 296 |
+| Share of launch tranches (tranche value 606 / 725) | 33.0% | 27.6% |
+| Investor IRR / MOIC: base | 26.4% / 2.78x | 29.2% / 2.87x |
+| Downside (resale +12m, price -10%) / upside (+10%) | 18.6% / 29.2% | 20.4% / 32.3% |
+| Appreciation +40% / +60% / none | 25.7% / 29.6% / 16.4% | 27.5% / 31.7% / 17.5% |
+| Jalour cost of capital / NPV cost at 14% | 20.7% / -19.1 | 22.6% / -20.8 |
+| Peak shortage before ticket (base 102.5 / 102.0) | 117.9 | 137.4 |
 
-**Why the collision happens.** GS: payouts start M30 on the model's early delivery receipts, then net cash flow is negative M39-M48 (-93, -121, -172, -118) and only 4-27 per quarter after. LA: net cash flow is negative M48-M54 (-30, -129, -98). Every structure that pays in those quarters fails the 1.5x test, so no structure paying into them passes. **Fix (S4):** keep 1.75x and the 24m grace, but schedule instalments only in quarters where cash available is at least 1.5x the instalment (GS M30-36 and M51-60/63; LA M39-45 and M57-72), and sweep retained-unit sale proceeds into the payout account. Investor IRR is 16.5-17.4% (GS), 16.4-17.2% (LA). Downside: payouts are fixed, so coverage collapses and the funding gap after ticket and payouts is about -390 to -420 (GS) and -800 or worse (LA); S2/S3 pay later (IRR about 16.4-16.9%) but still leave that gap. This is why a Jalour sponsor commitment or return guarantee decision (item 13) matters.
+Costs scale linearly with the ticket (NPV cost at 50 / 75 / 125: GS -9.5 / -14.3 / -23.9; LA -10.4 / -15.6 / -26.0). The units need 17% to 41% of the first two tranches; retail-only breaks above 116M (GS) so a pro-rata mix (about 32% retail / 68% offices) is used. Taking the same area pro rata from all tranches costs more (GS 30.7%, LA 31.6%). **Cost to Jalour is a real transfer:** the investor receives launch-priced area that appreciates 43% to 49% while Jalour forgoes the launch-tranche collections; the investor's units also compete with Jalour's later sales.
 
-## 5. Recommendation
-Option A: retained pool, 2.0x on average-price basis (or 2.25x if you want about 20%). Option B: S4 at 1.75x (about 1.9x if you want 19-20%). Show S1-S3 in the DD memo as rejected alternatives. Use 80 / 85 down payments, 595.3 for L'avenir, and tell investors delivery timing is a key sensitivity.
+## Option B: cash (2.3x, 24m grace, 12 quarterly instalments)
+Investor IRR **26.5%** (both projects; same timing from funding), MOIC 2.30x; Jalour cost equals the investor IRR. Option A and B are close for Green Square (26.4% vs 26.5%); Option A is richer for L'avenir (29.2%).
+| Ticket 100 | GS | LA |
+|---|---|---|
+| S1 fixed: quarters with net-cash-flow coverage below 1.5x | 9 of 12 | 4 of 12 |
+| S1 lowest cash-available coverage | 3.0x | 3.5x |
+| S2 % of collections (floor 0.4x, cap 1.5x): share / IRR | 24.7% / 29.0% | 19.7% / 28.7% |
+| S3 hybrid (1.8x fixed + share, cap 2.8x): share / IRR | 3.5% / 27.8% | 2.9% / 27.4% |
+| Lowest pooled cash after payouts: base / downside / stress | -2 / -418 / -284 | -2 / -864 / -240 |
 
-## 6. Decisions I need from you
-1. L'avenir 595.3 basis (not 642). 2. Return level: stay at 2.0x / 1.75x (about 16-17.5%, below the 19% deposit rate) or raise it. 3. Face value basis: average modelled price or launch list. 4. Delivery-payment timing: correct the model or support it with contract terms. 5. Does Jalour guarantee any return or commit sponsor funding for the downside? 6. Landlord: ask for the 35% waiver on investor units and release of its interest in the retained units? 7. Discount rate: keep 14% or show 19%+. 8. Proceed to the GS 100M master pack on these terms?
+**Recommend S1 (fixed 2.3x, equal instalments).** It matches your structure and is the simplest to close. **No structure passes a 1.5x test on quarterly net cash flow in every quarter** (the construction peak is net negative: GS months 39 to 48, LA 48 to 54), and with no ring-fence nothing can cure that. I disclose it, show pooled-cash coverage (at least 3.0x GS, 3.5x LA in base) and rely on Jalour's funding undertaking. At 125M GS the pooled-cash coverage is only 1.41x in one quarter.
+Percent-of-collections share per ticket (S2): GS 12.4%, 18.5%, 24.7%, 30.9%; LA 9.9%, 14.8%, 19.7%, 24.6% at 50 / 75 / 100 / 125.
 
-Files: `00_Model_Reconciliation.md`, `01_Structuring_Analysis.xlsx`, `02_Open_Items_Register.md`, scripts in `_build/`. No deliverable has been built. The workbook's scenario and option sheets hold Python-computed values; Base_CF carries live formulas with zero-check cells. Phase 3 annex will be fully formula-driven.
+## What the funding gap looks like (you will fund this)
+Delivery payments at handover: GS 269, LA 244. Sales +12 months and prices -10%: GS 441, LA 849. Both exceed any ticket several times over. Ticket 125 exceeds the modelled peak by 22.5 / 23.0 (general project liquidity, not restricted).
+
+## No guarantee: recommendation (decision 5)
+Do not guarantee the return. Offer instead: payment priority covenant (no shareholder distributions while an instalment is overdue), earmark of unsold launch-tranche or later units worth at least the ticket with substitution, negative pledge, monthly reporting and audit rights, and a sponsor funding undertaking limited to project funding gaps and completion. Optional: promissory notes, independent engineer, step-in right.
+
+## Items needing you
+1. Sponsor funding undertaking: amount, form and wording (a statement that Jalour covers gaps is a commitment; the downside gap is GS 441 / LA 849).
+2. "Nothing ring-fenced" versus Decree 2184/2022 (separate project account reported for developers on state-linked land): counsel to confirm. I kept each project in its own company with no cross-collateral, and no restricted accounts.
+3. Landlord consent for launch-price unit allocation (no waiver requested).
+4. L'avenir price rises 44% to 50% from first sale and GS 33% to 48%: GS sits below your 40% to 60% on retail.
+5. Market data are from search summaries; verify before issue.
