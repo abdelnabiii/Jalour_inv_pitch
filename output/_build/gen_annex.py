@@ -492,20 +492,21 @@ def make_annex(k, T, path):
     wsV = wb.create_sheet('Cover', 0); wsV.sheet_view.showGridLines = False
     wsV['A1'] = f'{name} - Financial Annex'; wsV['A1'].font = Font(name=AR, size=18, bold=True, color='1F3864')
     wsV['A2'] = f'Investor ticket EGP {T} million  |  Strictly private and confidential  |  Projections only, not guarantees'; wsV['A2'].font = F_B
-    notes = ['Purpose: supports the Investment Memorandum, Pitch Deck and Due Diligence Memorandum. Every figure in those documents traces to the Summary sheet.',
+    notes = ['ALL INFORMATION IN THIS WORKBOOK IS CONFIDENTIAL AND SUBJECT TO THE NON-DISCLOSURE AGREEMENT. Do not copy, forward or disclose it.',
+             'Purpose: supports the Investment Memorandum, Pitch Deck and Due Diligence Memorandum. Every figure in those documents traces to the Summary sheet.',
              'Colour code: blue = input or value transcribed from the source model; black = formula; green = link to another sheet.',
              'Units: EGP million unless stated. Quarter-end months. NPV at 14% p.a. (end-of-quarter discounting). IRRs are annualised from quarterly flows.',
              'Sheets: Inputs, Source_Data, Project_CF, Sources_Uses, Option_A, Option_B, Scenarios, Sensitivity, ' + ('Combined_Position, ' if T == 125 else '') + 'Summary, Reconciliation.',
              'The balance of project funding is provided by Jalour sponsor equity, project collections and other capital sources.',
              'Jalour may raise further capital at project or holding level, subject to the investor\'s stated rights.',
              'Reconciliation status:']
-    for j, t_ in enumerate(notes): wsV.cell(4+j, 1, t_).font = F_N
-    wsV.cell(10, 2, f"=Reconciliation!D{last+3}").font = F_B; wsV.cell(10, 2).fill = FILL_OK
+    for j, t_ in enumerate(notes): wsV.cell(4+j, 1, t_).font = F_B if j == 0 else F_N
+    wsV.cell(11, 2, f"=Reconciliation!D{last+3}").font = F_B; wsV.cell(11, 2).fill = FILL_OK
     wsV.column_dimensions['A'].width = 150; wsV.column_dimensions['B'].width = 22
     order = ['Cover', 'Summary', 'Inputs', 'Source_Data', 'Project_CF', 'Sources_Uses', 'Option_A', 'Option_B', 'Scenarios', 'Sensitivity'] + (['Combined_Position'] if COMB else []) + ['Reconciliation']
     wb._sheets = [wb[n] for n in order]
     wb.save(path)
-    return dict(M=M, SCN=SCN, SEN=SEN, last=last)
+    return dict(M=M, SCN=SCN, SEN=SEN, last=last, BLK=dict(BLK), P_=dict(P_), S=dict(S), U=dict(U))
 if __name__ == '__main__':
     info = make_annex(sys.argv[1], int(sys.argv[2]), sys.argv[3]); import json; json.dump({'M': info['M']}, open(sys.argv[3] + '.map.json', 'w'))
     print('annex written')

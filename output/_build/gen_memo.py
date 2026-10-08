@@ -21,10 +21,12 @@ def build_memo(k, T, path, workdir):
         d.p('INVESTMENT MEMORANDUM', bold=True, size=14, color=NAVY, after=2)
         d.p(f'Private placement of EGP {T} million (USD {T/48:,.1f} million at EGP 48 per USD)', size=12, after=2)
         d.p('Option A: units. Option B: cash.', size=12, after=36)
+        d.p('ALL INFORMATION IN THIS DOCUMENT IS CONFIDENTIAL AND SUBJECT TO THE NON-DISCLOSURE AGREEMENT.', bold=True, size=9.5, color=BRASS, after=8)
         d.p('Issued by Jalour Developments, a subsidiary of Al Jalal Holding, Cairo', size=10.5, after=2)
         d.p('October 2026. Draft for discussion with the named investor only.', size=10.5, color=GREY)
         # ---------- notice ----------
         d.h1('Important notice')
+        d.callout('**ALL INFORMATION IN THIS DOCUMENT, IN THE OTHER DOCUMENTS OF THIS PACK AND IN THE DATA ROOM IS CONFIDENTIAL. It is provided only under the non-disclosure agreement between the recipient and Jalour, and must not be disclosed, copied, forwarded or used for any other purpose.**')
         for t in ['This memorandum has been prepared by Jalour Developments (Jalour) for the sole use of the investor to whom it is addressed. It is confidential. It must not be copied, distributed or disclosed to any other person without Jalour\'s written consent.',
                   'It is not an offer to the public and is not a prospectus. It has not been reviewed or approved by any regulator. Whether this placement requires any regulatory filing, approval or exemption in Egypt or elsewhere is a matter for legal counsel; nothing here is legal, tax or investment advice.',
                   'All forecasts, returns, multiples, internal rates of return, cash flows and market statements are projections or reported third-party statements, not statements of fact or guarantees. Actual results may differ materially. Every return figure in this memorandum is labelled with its case (base, downside or upside).',

@@ -26,7 +26,7 @@ def scen_defs(): return {
  'Delivery payments at handover': dict(deliv_aligned=True), 'Handover payments and downside combined': dict(deliv_aligned=True, price=0.9, delay_q=4)}
 def build(k, T):
     p = P[k]; I = INFO[k]; Lh = launch(k); b = series(k); F = FACE_X*T
-    D = dict(k=k, T=T, info=I, folder=f'{k}_{T:03d}M')
+    D = dict(k=k, T=T, info=I, folder=f'{k}_{T}M')
     D['proj'] = {nm: dict(net=float(series(k, **kw)['net'].sum()), npv=npv(series(k, **kw)['net']), peak=float(series(k, **kw)['cum'].min()), peak_m=int(MONTHS[series(k, **kw)['cum'].argmin()])) for nm, kw in scen_defs().items()}
     D['base'] = dict(net=float(b['net'].sum()), npv=npv(b['net']), peak=float(b['cum'].min()), peak_m=int(MONTHS[b['cum'].argmin()]), coll=float(b['coll'].sum()), land=float(b['land'].sum()),
                      cost=float((b['cons']+b['comm']+b['sga']).sum()), cons=float(b['cons'].sum()), commission=float(b['comm'].sum()), sga=float(b['sga'].sum()),
@@ -108,19 +108,50 @@ def build(k, T):
     pl_c_, pl_a_ = Lh['p0']; pf_c_, pf_a_ = Lh['fin']; ap_c_, ap_a_ = D['prices']['avg']
     D['pricecmp'] = dict(years=yrs, ask_mid_off=mid, off_vs_ask=pf_a_/mid-1, off_cagr=(pf_a_/mid)**(1/yrs)-1, launch_off_vs_ask=pl_a_/mid-1, retail_g=pf_c_/pl_c_-1, office_g=pf_a_/pl_a_-1, retail_avg_g=ap_c_/pl_c_-1, office_avg_g=ap_a_/pl_a_-1, blended=A['appr']-1)
 
-    if T == 125:
-        ok = 'LA' if k == 'GS' else 'GS'; Io = INFO[ok]; bo = series(ok); pk_o = float(bo['cum'].min())
-        comb = {}
-        for nm, kw in scen_defs().items():
-            ss, so = series(k, **kw), series(ok, **kw); cum = ss['cum'] + so['cum']; i = int(cum.argmin())
-            comb[nm] = dict(self_peak=float(ss['cum'].min()), other_peak=float(so['cum'].min()), comb_peak=float(cum.min()), comb_peak_m=int(MONTHS[i]), net=float((ss['net']+so['net']).sum()), npv=npv(ss['net']+so['net']), self_at_peak=float(ss['cum'][i]), other_at_peak=float(so['cum'][i]),
-                            other_npv=npv(so['net']), other_net=float(so['net'].sum()))
-        cc = b['cum'] + bo['cum']; i = int(cc.argmin()); dn = series(k, price=0.9, delay_q=4); jd = int(dn['cum'].argmin())
-        D['combined'] = dict(other_k=ok, other=dict(Io, k=ok), months=MONTHS[:43].tolist(), self_cum=b['cum'][:43].tolist(), other_cum=bo['cum'][:43].tolist(), comb_cum=cc[:43].tolist(), comb_min=float(cc.min()), comb_min_m=int(MONTHS[i]),
-                             other_net_series=bo['net'].tolist(), other_base=dict(coll=float(bo['coll'].sum()), land=float(bo['land'].sum()), cost=float((bo['cons']+bo['comm']+bo['sga']).sum()), net=float(bo['net'].sum()), npv=npv(bo['net']), peak=pk_o, peak_m=int(MONTHS[bo['cum'].argmin()])),
-                             scen=comb, own_dn_peak_m=int(MONTHS[jd]), other_base_cum_at_own_dn_peak=float(bo['cum'][jd]), comb_pos_month=int(MONTHS[[j for j in range(len(cc)) if cc[j] > 0 and j >= i][0]]),
-                             other_scen_series={nm: series(ok, **kw)['net'].tolist() for nm, kw in scen_defs().items()})
     return D
+
+def sponsor_view(k):
+    """combined cash position of Green Square and L'avenir (sponsor level, before any investor instrument), from the point of view of project k."""
+    ok = 'LA' if k == 'GS' else 'GS'; Io = INFO[ok]; b = series(k); bo = series(ok)
+    comb = {}
+    for nm, kw in scen_defs().items():
+        ss, so = series(k, **kw), series(ok, **kw); cum = ss['cum'] + so['cum']; i = int(cum.argmin())
+        comb[nm] = dict(self_peak=float(ss['cum'].min()), other_peak=float(so['cum'].min()), comb_peak=float(cum.min()), comb_peak_m=int(MONTHS[i]), net=float((ss['net']+so['net']).sum()), npv=npv(ss['net']+so['net']))
+    cc = b['cum'] + bo['cum']; i = int(cc.argmin())
+    return dict(other_k=ok, months=MONTHS[:43].tolist(), self_cum=b['cum'][:43].tolist(), other_cum=bo['cum'][:43].tolist(), comb_cum=cc[:43].tolist(), comb_min=float(cc.min()), comb_min_m=int(MONTHS[i]),
+                comb_pos_month=int(MONTHS[[j for j in range(len(cc)) if cc[j] > 0 and j >= i][0]]), scen=comb, other_scen_series={nm: series(ok, **kw)['net'].tolist() for nm, kw in scen_defs().items()}, other_net_series=bo['net'].tolist())
+def build_combined(Te=62.5):
+    """One investor, ticket 2*Te: Te into Green Square and Te into L'avenir."""
+    G, L = build('GS', Te), build('LA', Te); C = dict(Te=Te, T=2*Te, GS=G, LA=L)
+    def agg(fl):  # sum of flow arrays
+        return np.sum([np.array(f) for f in fl], axis=0)
+    def met(a):   return dict(irr=irr(a), moic=moic(a), flows=a.tolist())
+    inv = {}
+    for nm in ('Base', 'Downside', 'Upside', 'Appreciation 40%', 'Appreciation 60%', 'Flat prices (0%)'):
+        inv[nm] = met(agg([G['A']['inv'][nm]['flows'], L['A']['inv'][nm]['flows']]))
+    jal_a = agg([G['A']['jal']['flows'], L['A']['jal']['flows']])
+    C['A'] = dict(face=G['A']['face']+L['A']['face'], value=G['A']['value_at_handover']+L['A']['value_at_handover'], inv=inv, jal=dict(irr=irr(jal_a, 0.0), npv=npv(jal_a), nominal=float(jal_a.sum()), flows=jal_a.tolist()),
+                  peak_ex_ticket=dict(GS=G['A']['jal']['peak_ex_ticket'], LA=L['A']['jal']['peak_ex_ticket']))
+    B = {}
+    for S in ('S1', 'S2', 'S3'):
+        res = {}
+        for sc in ('Base', 'Downside', 'Upside', 'Stress'):
+            pg = np.array(G['B']['S'][S]['res'][sc]['pay']); pl = np.array(L['B']['S'][S]['res'][sc]['pay'])
+            invf = inv_flow('GS', Te, pg) + inv_flow('LA', Te, pl); jl = jalour_B('GS', Te, pg) + jalour_B('LA', Te, pl)
+            sg, sl = {'Base': series('GS'), 'Downside': series('GS', price=0.9, delay_q=4), 'Upside': series('GS', price=1.1), 'Stress': series('GS', deliv_aligned=True)}[sc], {'Base': series('LA'), 'Downside': series('LA', price=0.9, delay_q=4), 'Upside': series('LA', price=1.1), 'Stress': series('LA', deliv_aligned=True)}[sc]
+            cash = liq_cash('GS', Te, pg, sg) + liq_cash('LA', Te, pl, sl)
+            res[sc] = dict(irr=irr(invf), moic=moic(invf), jirr=irr(jl, 0.0), jnpv=npv(jl), min_cash=float(cash.min()), min_cash_m=int(MONTHS[cash.argmin()]), paid=float(pg.sum()+pl.sum()), flows=invf.tolist(), jflows=jl.tolist(), pooled=cash.tolist())
+        B[S] = res
+    C['B'] = B
+    C['sponsor'] = sponsor_view('GS')
+    C['proj'] = {nm: dict(gs=G['proj'][nm], la=L['proj'][nm]) for nm in G['proj']}
+    # payback (combined) for A and B
+    def pb(fl, t0):
+        c = np.cumsum(np.array(fl)); 
+        for i in range(NQ):
+            if c[i] >= -1e-9 and i > t0//3-1: return int(MONTHS[i])
+    C['A_payback'] = pb(inv['Base']['flows'], 3); C['B_payback'] = pb(B['S1']['Base']['flows'], 3)
+    return C
 if __name__ == '__main__':
     D = build('GS', 100)
     print(json.dumps({a_: D[a_] for a_ in ('base', 'fund')}, indent=1, default=float))

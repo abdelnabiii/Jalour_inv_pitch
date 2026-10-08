@@ -63,6 +63,7 @@ Python engine vs spreadsheet reconciliation sheet: ALL CHECKS ZERO
 | Deck.pptx | 98 | 0   | 0  |
 | Financial_Annex.xlsx | 21 | 0   | 4 xl/worksheets/sheet10.xml: ...puts!$B$7,0)+Y233-Y236  -250.6764853125    Y238+IF(So... | xl/worksheets/sheet10.xml: ...44406875    AE378+AF377  250.175367773437    AF378+AG... | xl/worksheets/sheet10.xml: ...puts!$B$7,0)+L449-L452  -250.64432125    L454+IF(Sour... |
 | Investment_Memo.docx | 18 | 0   | 2 word/document.xml: ...162.1                   250                   160... | word/document.xml: ...162.1                    250                    160... |
+| NDA_Template.docx | 18 | 0   | 0  |
 
 Prohibited-term hits: 0. Bare "250" occurrences are listed for context only: they are prices or the units face value, not a programme total.
 

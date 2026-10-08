@@ -61,8 +61,9 @@ Python engine vs spreadsheet reconciliation sheet: ALL CHECKS ZERO
 |---|---|---|---|
 | DD_Memo.docx | 18 | 0   | 0  |
 | Deck.pptx | 98 | 0   | 0  |
-| Financial_Annex.xlsx | 21 | 0   | 2 xl/worksheets/sheet10.xml: ...44406875    AE378+AF377  250.175367773437    AF378+AG... | xl/worksheets/sheet7.xml: ....741935483871    88      250    B7*1000/Inputs!$B$28... |
+| Financial_Annex.xlsx | 21 | 0   | 2 xl/worksheets/sheet10.xml: ...44406875    AE378+AF377  250.175367773437    AF378+AG... | xl/worksheets/sheet7.xml: ....258064516129    89      250    B5*Inputs!$B$33/Input... |
 | Investment_Memo.docx | 18 | 0   | 2 word/document.xml: ...162.1                   250                   160... | word/document.xml: ...162.1                    250                    160... |
+| NDA_Template.docx | 18 | 0   | 0  |
 
 Prohibited-term hits: 0. Bare "250" occurrences are listed for context only: they are prices or the units face value, not a programme total.
 

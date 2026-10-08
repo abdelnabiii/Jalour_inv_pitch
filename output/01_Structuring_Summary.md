@@ -43,3 +43,5 @@ Do not guarantee the return. Offer instead: payment priority covenant (no shareh
 3. Prices compared with delivery prices: Option A and the price pages now use the delivery list (last list price in the plan, unchanged to handover). GS offices +48% and retail +33% from launch; LA +50% and +44%. Against today's office asking prices the delivery list is +77% (GS, about 15% a year) and +112% (LA, about 18% a year).
 4. Market fact base: sent to you for review before verification.
 5. Sponsor, permit, title and landlord-consent documents: marked as provided after the investor signs an NDA.
+
+**Update (125M).** A 125M ticket is now defined as one investor placing 62.5M in each project (one pack, COMBINED_125M). The single-project 125M columns above are analysis only and no 125M single-project pack exists. Combined 62.5 + 62.5: Option A IRR 27.7% base / 19.5% downside / 30.6% upside; Option B (2.3x) IRR 26.5%; combined base-case low -168.0 at month 15.

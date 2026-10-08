@@ -44,6 +44,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   s.addText(NAME, { x: 0.8, y: 2.0, w: 11.5, h: 1.2, fontFace: 'Cambria', fontSize: 54, bold: true, color: WHITE, margin: 0, isTextBox: true });
   s.addText('Commercial and office development, El Mostakbal City, Cairo', { x: 0.8, y: 3.2, w: 11.5, h: 0.5, fontSize: 22, color: 'D5DAE1', margin: 0, isTextBox: true });
   s.addText(`Private placement: investor ticket of EGP ${T} million`, { x: 0.8, y: 4.3, w: 11.5, h: 0.5, fontSize: 20, bold: true, color: BRASS, margin: 0, isTextBox: true });
+  s.addText('ALL INFORMATION IN THIS PRESENTATION IS CONFIDENTIAL AND SUBJECT TO THE NON-DISCLOSURE AGREEMENT. Do not copy, forward or disclose it.', { x: 0.8, y: 5.55, w: 11.5, h: 0.6, fontSize: 13, bold: true, color: BRASS, margin: 0, isTextBox: true });
   s.addText('Investment presentation  |  Jalour Developments, a subsidiary of Al Jalal Holding  |  October 2026', { x: 0.8, y: 6.4, w: 11.5, h: 0.4, fontSize: 13, color: 'D5DAE1', margin: 0, isTextBox: true });
   s.addNotes('Cover. All figures are projections based on the Jalour financial model; see the Financial Annex.'); }
 // 2 Highlights
@@ -214,6 +215,6 @@ if (D.combined) { const C = D.combined, O = C.other; const s = content(`Combined
   s.addText(`Jalour invites an investment of EGP ${T} million in ${NAME}, with the choice of Option A (units, 2.0x face value) or Option B (cash, ${mx(B.mult, 1)} over 3 years after a 24-month grace period).`, { x: 0.8, y: 1.8, w: 11.5, h: 1.2, fontSize: 18, color: 'D5DAE1', margin: 0, isTextBox: true });
   const steps = ['Review this presentation, the Investment Memorandum and the Financial Annex', 'Select Option A or Option B and confirm the ticket', 'Due diligence: data room, legal and technical review', 'Landlord consent and definitive documents', 'Signing and funding'];
   steps.forEach((t, i) => { const y = 3.3 + i * 0.62; s.addShape(pres.shapes.OVAL, { x: 0.8, y, w: 0.42, h: 0.42, fill: { color: BRASS }, line: { color: BRASS, width: 0 } }); s.addText(String(i + 1), { x: 0.8, y, w: 0.42, h: 0.42, align: 'center', valign: 'middle', fontSize: 14, bold: true, color: WHITE, margin: 0, isTextBox: true }); s.addText(t, { x: 1.45, y, w: 10.8, h: 0.42, fontSize: 16, color: WHITE, valign: 'middle', margin: 0, isTextBox: true }); });
-  s.addText('Jalour may raise further capital at project or holding level, subject to the investor\'s stated rights. Projections are not guarantees. Strictly private and confidential.', { x: 0.8, y: 6.55, w: 11.5, h: 0.5, fontSize: 11, color: 'AAB2BD', margin: 0, isTextBox: true });
+  s.addText('Jalour may raise further capital at project or holding level, subject to the investor\'s stated rights. Projections are not guarantees. All information in this presentation and in the other documents of this pack is confidential and subject to the non-disclosure agreement.', { x: 0.8, y: 6.55, w: 11.5, h: 0.5, fontSize: 11, color: 'AAB2BD', margin: 0, isTextBox: true });
   s.addNotes('Next steps and contact details to be added by Jalour.'); }
 pres.writeFile({ fileName: outPath }).then(() => console.log('deck written', sn));
