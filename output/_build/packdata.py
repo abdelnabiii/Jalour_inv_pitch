@@ -3,6 +3,13 @@ import sys, json, copy
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
 from engine2 import *
 USD = 48.0
+# Standalone timelines: each project's month 1 is its own sales launch (the uploaded standalone models). Internally the engine keeps the combined
+# model's calendar (month 3, 6, 9 ...); OFF is the number of months removed to get the project's own month. Own month = engine month - OFF.
+OFF = {'GS': 6, 'LA': 12}
+_K = ['GS']
+_npv_engine = npv
+def npv(cf, r=DISC): return _npv_engine(cf, r) * (1 + r) ** (OFF[_K[0]] / 12)    # discount to the project's own month 0 (standalone model)
+def own(k, m): return None if m is None else int(m) - OFF[k]
 INFO = {
  'GS': dict(short='GS', name='Green Square', land=14470, footprint=4341, retail=4341, office=8682, bua=13023, admin_sales_area=10129, height='G+2',
             sales_start=7, con_start=13, con_months=36, delivery=48, guarantee=800.0, dp=80.0, sched=[45, 90, 135, 180, 180, 90], excess_years=8,
@@ -10,8 +17,9 @@ INFO = {
  'LA': dict(short='LA', name="L'avenir", land=14910, footprint=4473, retail=4473, office=8946, bua=13419, admin_sales_area=10437, height='G+2',
             sales_start=13, con_start=19, con_months=36, delivery=54, guarantee=850.0, dp=85.0, sched=[0, 90, 180, 225, 180, 90], excess_years=8,
             total100=3342.1696875, total80=2673.73575, inflow=1503.976359375, cons=697.16, comm=106.94943, sga=104.574, retained=0.20)}
-MODEL_REF = {'GS': dict(net=375.4475275, npv=215.31139254892392, peak=-102.5, land=985.6783125, coll=2252.979, cost=891.85316),
-             'LA': dict(net=595.292929375, npv=307.5323710915294, peak=-102.0180625, land=1169.759390625, coll=2673.73575, cost=908.68343)}
+INFO_OWN = {k: dict(v, sales_start=v['sales_start']-OFF[k], con_start=v['con_start']-OFF[k], delivery=v['delivery']-OFF[k]) for k, v in INFO.items()}
+MODEL_REF = {'GS': dict(net=375.4475275, npv=229.889658679869, peak=-102.5, land=985.6783125, coll=2252.979, cost=891.85316),
+             'LA': dict(net=595.292929375, npv=350.586903044344, peak=-102.0180625, land=1169.759390625, coll=2673.73575, cost=908.68343)}
 def liq_cash(k, T, pay, s):
     c = np.zeros(NQ); c[P[k]['t0']//3-1] += T; return (c + s['net'] - pay).cumsum()
 def liq_cov(k, T, pay, s):
@@ -25,7 +33,7 @@ def scen_defs(): return {
  'Construction cost +10%': dict(cost=1.10), 'Collections slip 2 quarters': dict(slip_q=2),
  'Delivery payments at handover': dict(deliv_aligned=True), 'Handover payments and downside combined': dict(deliv_aligned=True, price=0.9, delay_q=4)}
 def build(k, T):
-    p = P[k]; I = INFO[k]; Lh = launch(k); b = series(k); F = FACE_X*T
+    _K[0] = k; p = P[k]; I = INFO[k]; Lh = launch(k); b = series(k); F = FACE_X*T
     D = dict(k=k, T=T, info=I, folder=f'{k}_{T}M')
     D['proj'] = {nm: dict(net=float(series(k, **kw)['net'].sum()), npv=npv(series(k, **kw)['net']), peak=float(series(k, **kw)['cum'].min()), peak_m=int(MONTHS[series(k, **kw)['cum'].argmin()])) for nm, kw in scen_defs().items()}
     D['base'] = dict(net=float(b['net'].sum()), npv=npv(b['net']), peak=float(b['cum'].min()), peak_m=int(MONTHS[b['cum'].argmin()]), coll=float(b['coll'].sum()), land=float(b['land'].sum()),
@@ -104,25 +112,50 @@ def build(k, T):
     D['tranches'] = [dict(month=t['month'], comm=t['sales_comm']/1000, admin=t['sales_admin']/1000, pc=t['price_comm'], pa=t['price_admin']) for t in TR[k]['tranches']]
     ach = TR[k]['tranches']; area_c = sum(t['area_comm'] for t in ach); area_a = sum(t['area_admin'] for t in ach)
     D['prices'] = dict(launch=Lh['p0'], final=Lh['fin'], avg=(sum(t['sales_comm'] for t in ach)/area_c, sum(t['sales_admin'] for t in ach)/area_a), sold_area=(area_c, area_a))
-    yrs = (I['delivery']+2)/12; mid = 113.0       # ASSUMPTION: model month 1 = December 2026; office asking mid-point EGP 113,000 per m2 (106,000 to 120,000)
+    yrs = (P[k]['delivery']+2)/12; mid = 113.0       # ASSUMPTION: model month 1 = December 2026; office asking mid-point EGP 113,000 per m2 (106,000 to 120,000)
     pl_c_, pl_a_ = Lh['p0']; pf_c_, pf_a_ = Lh['fin']; ap_c_, ap_a_ = D['prices']['avg']
     D['pricecmp'] = dict(years=yrs, ask_mid_off=mid, off_vs_ask=pf_a_/mid-1, off_cagr=(pf_a_/mid)**(1/yrs)-1, launch_off_vs_ask=pl_a_/mid-1, retail_g=pf_c_/pl_c_-1, office_g=pf_a_/pl_a_-1, retail_avg_g=ap_c_/pl_c_-1, office_avg_g=ap_a_/pl_a_-1, blended=A['appr']-1)
 
+    return _own(D, k)
+
+def _own(D, k):
+    """Convert every month-valued field of a build() result from the engine calendar to the project's own timeline (M1 = sales launch)."""
+    o = OFF[k]; I = dict(D['info']); I.update(sales_start=I['sales_start']-o, con_start=I['con_start']-o, delivery=I['delivery']-o); D['info'] = I
+    D['t0'] = own(k, P[k]['t0']); D['dp_month'] = own(k, 30 if k == 'GS' else 45); D['off'] = o
+    for v in D['proj'].values(): v['peak_m'] = own(k, v['peak_m'])
+    D['base']['peak_m'] = own(k, D['base']['peak_m'])
+    D['A']['launch_months'] = [own(k, m) for m in D['A']['launch_months']]
+    for t in D['tranches']: t['month'] = own(k, t['month'])
+    D['B']['pay_months'] = [own(k, m) for m in D['B']['pay_months']]
+    for S in D['B']['S'].values():
+        for r in S['res'].values():
+            r['min_cash_m'] = own(k, r['min_cash_m']); r['last'] = own(k, r['last']); r['liq'] = [(own(k, m), c) for m, c in r['liq']]
+    D['A_payback'] = own(k, D['A_payback']); D['B_payback'] = own(k, D['B_payback'])
+    D['series']['months'] = [m - o for m in D['series']['months']]
+    # annual aggregation by the project's own years (year 0 = before month 1)
+    b = series(k); mo = np.array(D['series']['months']); ann = []
+    for y in range(0, 12):
+        idx = [i for i, m in enumerate(mo) if (12*(y-1) < m <= 12*y if y else m <= 0)]
+        if not idx: continue
+        ann.append(dict(year=y, coll=float(sum(b['coll'][i] for i in idx)), land=float(sum(b['land'][i] for i in idx)), cost=float(sum(b['cons'][i]+b['comm'][i]+b['sga'][i] for i in idx)),
+                        net=float(sum(b['net'][i] for i in idx)), cum=float(b['cum'][idx[-1]])))
+    D['annual'] = ann
     return D
 
 def sponsor_view(k):
+    _K[0] = 'GS'; c6 = lambda m: int(m) - OFF['GS']      # combined views use one common calendar: month 1 = Green Square launch; L'avenir launches in month 7
     """combined cash position of Green Square and L'avenir (sponsor level, before any investor instrument), from the point of view of project k."""
     ok = 'LA' if k == 'GS' else 'GS'; Io = INFO[ok]; b = series(k); bo = series(ok)
     comb = {}
     for nm, kw in scen_defs().items():
         ss, so = series(k, **kw), series(ok, **kw); cum = ss['cum'] + so['cum']; i = int(cum.argmin())
-        comb[nm] = dict(self_peak=float(ss['cum'].min()), other_peak=float(so['cum'].min()), comb_peak=float(cum.min()), comb_peak_m=int(MONTHS[i]), net=float((ss['net']+so['net']).sum()), npv=npv(ss['net']+so['net']))
+        comb[nm] = dict(self_peak=float(ss['cum'].min()), other_peak=float(so['cum'].min()), comb_peak=float(cum.min()), comb_peak_m=c6(MONTHS[i]), net=float((ss['net']+so['net']).sum()), npv=npv(ss['net']+so['net']))
     cc = b['cum'] + bo['cum']; i = int(cc.argmin())
-    return dict(other_k=ok, months=MONTHS[:43].tolist(), self_cum=b['cum'][:43].tolist(), other_cum=bo['cum'][:43].tolist(), comb_cum=cc[:43].tolist(), comb_min=float(cc.min()), comb_min_m=int(MONTHS[i]),
-                comb_pos_month=int(MONTHS[[j for j in range(len(cc)) if cc[j] > 0 and j >= i][0]]), scen=comb, other_scen_series={nm: series(ok, **kw)['net'].tolist() for nm, kw in scen_defs().items()}, other_net_series=bo['net'].tolist())
+    return dict(other_k=ok, months=[c6(m) for m in MONTHS[:43]], self_cum=b['cum'][:43].tolist(), other_cum=bo['cum'][:43].tolist(), comb_cum=cc[:43].tolist(), comb_min=float(cc.min()), comb_min_m=c6(MONTHS[i]),
+                comb_pos_month=c6(MONTHS[[j for j in range(len(cc)) if cc[j] > 0 and j >= i][0]]), scen=comb, other_scen_series={nm: series(ok, **kw)['net'].tolist() for nm, kw in scen_defs().items()}, other_net_series=bo['net'].tolist())
 def build_combined(Te=62.5):
     """One investor, ticket 2*Te: Te into Green Square and Te into L'avenir."""
-    G, L = build('GS', Te), build('LA', Te); C = dict(Te=Te, T=2*Te, GS=G, LA=L)
+    G, L = build('GS', Te), build('LA', Te); C = dict(Te=Te, T=2*Te, GS=G, LA=L); _K[0] = 'GS'; c6 = lambda m: int(m) - OFF['GS']
     def agg(fl):  # sum of flow arrays
         return np.sum([np.array(f) for f in fl], axis=0)
     def met(a):   return dict(irr=irr(a), moic=moic(a), flows=a.tolist())
@@ -140,7 +173,7 @@ def build_combined(Te=62.5):
             invf = inv_flow('GS', Te, pg) + inv_flow('LA', Te, pl); jl = jalour_B('GS', Te, pg) + jalour_B('LA', Te, pl)
             sg, sl = {'Base': series('GS'), 'Downside': series('GS', price=0.9, delay_q=4), 'Upside': series('GS', price=1.1), 'Stress': series('GS', deliv_aligned=True)}[sc], {'Base': series('LA'), 'Downside': series('LA', price=0.9, delay_q=4), 'Upside': series('LA', price=1.1), 'Stress': series('LA', deliv_aligned=True)}[sc]
             cash = liq_cash('GS', Te, pg, sg) + liq_cash('LA', Te, pl, sl)
-            res[sc] = dict(irr=irr(invf), moic=moic(invf), jirr=irr(jl, 0.0), jnpv=npv(jl), min_cash=float(cash.min()), min_cash_m=int(MONTHS[cash.argmin()]), paid=float(pg.sum()+pl.sum()), flows=invf.tolist(), jflows=jl.tolist(), pooled=cash.tolist())
+            res[sc] = dict(irr=irr(invf), moic=moic(invf), jirr=irr(jl, 0.0), jnpv=npv(jl), min_cash=float(cash.min()), min_cash_m=c6(MONTHS[cash.argmin()]), paid=float(pg.sum()+pl.sum()), flows=invf.tolist(), jflows=jl.tolist(), pooled=cash.tolist())
         B[S] = res
     C['B'] = B
     C['sponsor'] = sponsor_view('GS')
@@ -149,7 +182,7 @@ def build_combined(Te=62.5):
     def pb(fl, t0):
         c = np.cumsum(np.array(fl)); 
         for i in range(NQ):
-            if c[i] >= -1e-9 and i > t0//3-1: return int(MONTHS[i])
+            if c[i] >= -1e-9 and i > t0//3-1: return c6(MONTHS[i])
     C['A_payback'] = pb(inv['Base']['flows'], 3); C['B_payback'] = pb(B['S1']['Base']['flows'], 3)
     return C
 if __name__ == '__main__':

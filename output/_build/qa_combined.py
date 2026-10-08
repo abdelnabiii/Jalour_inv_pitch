@@ -23,13 +23,13 @@ def run(Te=62.5):
         rep.append(f'| {lab} | python | {val:.4f} | ' + ', '.join(f'{a}: {"yes" if b else "NO"}' for a, b in res.items()) + f' | {"OK" if ok else "CHECK"} |')
     rep.append(f'\nTie-out misses: {miss}\n'); fails += miss
     # 2 independent
-    t = [3*(i+1)/12 for i in range(60)]
+    t = [(3*(i+1)-PD.OFF['GS'])/12 for i in range(60)]; tk = {k_: [(3*(i+1)-PD.OFF[k_])/12 for i in range(60)] for k_ in ('GS', 'LA')}
     def rv(sheet, r): ws = wb[sheet]; return [ws.cell(r, 4+i).value or 0 for i in range(60)]
     add = lambda a, b: [x+y for x, y in zip(a, b)]
     invA = add(rv('GS_Option_A', 17), rv('LA_Option_A', 17)); jal = add(rv('GS_Option_A', 21), rv('LA_Option_A', 21)); invB = add(rv('GS_Option_B', 14), rv('LA_Option_B', 14))
     chk = [('Option A combined investor IRR', indep_irr(invA, t), S['a_irr'], 1e-4), ('Option A combined MOIC', sum(x for x in invA if x > 0)/-sum(x for x in invA if x < 0), S['a_moic'], 1e-4), ('Option A Jalour cost of capital', indep_irr(jal, t, 0.0), S['j_irr'], 1e-4), ('Option A Jalour NPV @14%', sum(c/(1.14**ti) for c, ti in zip(jal, t)), S['j_npv'], 1e-4), ('Option B combined investor IRR', indep_irr(invB, t), S['b_irr'], 1e-4)]
     for p, D in (('GS', G), ('LA', L)):
-        net = rv(f'{p}_Project_CF', 13); chk.append((f'{p} project NPV @14%', sum(c/(1.14**ti) for c, ti in zip(net, t)), D['base']['npv'], 1e-4)); chk.append((f'{p} net cash flow', sum(net), D['base']['net'], 1e-4))
+        net = rv(f'{p}_Project_CF', 13); chk.append((f'{p} project NPV @14% (own timeline)', sum(c/(1.14**ti) for c, ti in zip(net, tk[p])), D['base']['npv'], 1e-4)); chk.append((f'{p} net cash flow', sum(net), D['base']['net'], 1e-4))
     nets = add(rv('GS_Project_CF', 13), rv('LA_Project_CF', 13)); cum = 0; mn = 0; i_mn = 0
     for i, x in enumerate(nets):
         cum += x
@@ -40,10 +40,15 @@ def run(Te=62.5):
         diff = abs(a-b); ok = diff <= tol; bad += (not ok); rep.append(f'| {lab} | {a:.6f} | {b:.6f} | {diff:.2e} | {"OK" if ok else "EXPLAIN"} |')
     rc = wb['Combined_Reconciliation']; rep.append(f'\nAnnex reconciliation sheet final check: {rc.cell(rc.max_row, 4).value}\n'); fails += bad
     # 3 disclosure scan
-    pats = ['AT' + ' EAST', 'At' + ' East', 'AT' + ' East', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise', 'exclusive investor', 'sole investor', 'ring-fenced for']
+    pats = ['retain', 'AT' + ' EAST', 'At' + ' East', 'AT' + ' East', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise', 'exclusive investor', 'sole investor', 'ring-fenced for']
     rep.append('## 3. Disclosure scan (every part of every file)\n\nBoth project names are permitted in this pack: it is the single combined investor pack.\n\n| File | Parts scanned | Prohibited hits | Confidentiality statement |\n|---|---|---|---|'); ht = 0
     for f in sorted(glob.glob(folder + '/*')):
-        z = zipfile.ZipFile(f); parts = 0; hits = []; conf = False
+        parts = 0; hits = []; conf = False
+        if f.endswith('.pdf'):
+            import subprocess; tx = subprocess.run(['pdftotext', f, '-'], capture_output=True, text=True).stdout; parts = 1
+            hits = [f'{p_} in pdf text' for p_ in pats if p_.lower() in tx.lower()]; conf = bool(re.search(r'(?i)confidential', tx))
+            ht += len(hits) + (not conf); rep.append(f'| {os.path.basename(f)} | {parts} | {len(hits)} {"; ".join(hits[:5])} | {"yes" if conf else "MISSING"} |'); continue
+        z = zipfile.ZipFile(f)
         for nme in z.namelist():
             if not nme.endswith(('.xml', '.rels', '.txt', '.json')): continue
             tx = z.read(nme).decode('utf8', 'ignore'); parts += 1; clean = re.sub(r'<[^>]+>', ' ', tx)
