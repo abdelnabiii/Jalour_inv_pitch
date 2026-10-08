@@ -22,8 +22,8 @@ def table(ws, r0, headers, rows, fmts=None, widths=None):
         for j, w in enumerate(widths): ws.column_dimensions[L(1+j)].width = w
     ws.row_dimensions[r0].height = 48; return r0+1+len(rows)
 TK = (50, 75, 100, 125); DS = {(k, T): PD.build(k, T) for k in ('GS', 'LA') for T in TK}
-ws = sheet('README', 'INTERNAL structuring analysis, revised after your decisions (Phase 2). Not for investors.', 'Source of truth: ALAHLY-SABBOUR MOSTAKBAL CITY -V2.xlsx. Results computed in Python (_build/engine2.py, packdata.py); the Financial Annexes recompute them with live formulas and tie to these values.')
-for i, t in enumerate(['EGP million unless stated. NPV and IRR on quarter-end months, discount rate 14% (kept by Jalour). Investor funds at GS month 3 / LA month 12.',
+ws = sheet('README', 'INTERNAL structuring analysis, revised after your decisions (Phase 2). Not for investors.', 'Source of truth: the two standalone project models (Green_Square.xlsx, Lavenir.xlsx; each project month 1 is its own sales launch). Results computed in Python (_build/engine2.py, packdata.py); the Financial Annexes recompute them with live formulas and tie to these values.')
+for i, t in enumerate(['EGP million unless stated. NPV and IRR on quarter-end months, discount rate 14% (kept by Jalour). Investor funds at GS month -3 / LA month 0 (each project own timeline; combined view uses a common calendar with GS launch = month 1 and L\'avenir launch = month 7).',
         'Option A: units priced at the LAUNCH LIST (first sales tranche) with face value 2.0x the ticket, taken from the first two sales tranches. The 20% retained units are not used.',
         'Option B: 2.3x the ticket, 24-month grace, 12 equal quarterly instalments (recommended structure S1). S2 (share of collections) and S3 (hybrid) shown as alternatives.',
         'Nothing is ring-fenced: no reserve, escrow or collection account. The ticket is pooled project cash.',
@@ -64,10 +64,10 @@ r = 3
 for k in ('GS', 'LA'):
     D = DS[(k, 100)]; S1 = D['B']['S']['S1']['res']['Base']; net = D['series']['net']; liq = dict(S1['liq'])
     ws2.cell(r, 1, PD.INFO[k]['name']).font = Font(name='Arial', bold=True)
-    rows = [[m, net[m//3-1], S1['pay'][m//3-1], net[m//3-1]/S1['pay'][m//3-1], liq.get(m)] for m in D['B']['pay_months']]
+    rows = [[m, net[(m+D['off'])//3-1], S1['pay'][(m+D['off'])//3-1], net[(m+D['off'])//3-1]/S1['pay'][(m+D['off'])//3-1], liq.get(m)] for m in D['B']['pay_months']]
     r = table(ws2, r+1, ['Month', 'Net cash flow', 'Instalment', 'Coverage (net CF)', 'Coverage (cash available)'], rows, ['0', N1, N1, '0.00', '0.00'], [10, 14, 12, 16, 20]) + 2
 ws = sheet('Assumptions_Log', 'Assumptions (confirm)')
-table(ws, 3, ['Ref', 'Assumption'], [['A1', 'Investor funds 100% at t0 (GS M3, LA M12); pooled with project cash, no restricted account.'], ['A2', 'Launch list = price list at the first sales tranche. Units come from the first two tranches (same price list).'], ['A3', 'Investor resale at final list price, 3% cost, four quarters from handover+3m.'], ['A4', 'Jalour cost of Option A = ticket received vs forgone launch-tranche collections plus commission saved; landlord payments unchanged.'],
+table(ws, 3, ['Ref', 'Assumption'], [['A1', 'Investor funds 100% at t0 (GS month -3, LA month 0); pooled with project cash, no restricted account.'], ['A2', 'Launch list = price list at the first sales tranche. Units come from the first two tranches (same price list).'], ['A3', 'Investor resale at final list price, 3% cost, four quarters from handover+3m.'], ['A4', 'Jalour cost of Option A = ticket received vs forgone launch-tranche collections plus commission saved; landlord payments unchanged.'],
     ['A5', 'Pre-construction cost 10.5 (30% of the 5% professional-fee line).'], ['A6', 'Downside: collections and commission +12 months, prices -10%; guarantee and construction timing unchanged.'], ['A7', 'Option B 2.3x per your instruction; no tuning to a target IRR.'], ['A8', 'Coverage "cash available" includes the ticket as pooled cash.']], None, [8, 150])
 
 ws = sheet('Combined_Position', 'INTERNAL ONLY: combined Green Square + L\'avenir cash position (Jalour level). Never include in any investor pack.', 'Cumulative net cash flow before any investor instrument, EGP million, base case, from the edited source model.')
@@ -82,7 +82,7 @@ g = DS[('GS', 100)]; l = DS[('LA', 100)]
 def P1(x): return f'{x*100:.1f}%'
 md = f"""# 01 Structuring Summary (INTERNAL, revised for your decisions)
 
-Projection only. EGP million. Detail: `01_Structuring_Analysis.xlsx`; every pack Financial Annex recomputes these numbers with live formulas and reconciles to the source model (GS net 375.4 / NPV 215.3; LA net 595.3 / NPV 307.5).
+Projection only. EGP million. Detail: `01_Structuring_Analysis.xlsx`; every pack Financial Annex recomputes these numbers with live formulas and reconciles to the source model (GS net 375.4 / NPV 229.9; LA net 595.3 / NPV 350.6, each at its own month 0).
 
 ## Applied from your decisions
 Retained units untouched; units at **launch list** (GS retail 225 / offices 135; LA 250 / 160 EGP thousand per m2) with face value 2.0x; cash 2.3x; nothing ring-fenced; Jalour bears the landlord 35%; Jalour covers project funding gaps; no return guarantee; discount rate 14%; other projects in the source workbook ignored.
@@ -110,7 +110,7 @@ Investor IRR **{P1(g['B']['S']['S1']['res']['Base']['irr'])}** (both projects; s
 | S3 hybrid (1.8x fixed + share, cap 2.8x): share / IRR | {P1(g['B']['params']['S3_pct'])} / {P1(g['B']['S']['S3']['res']['Base']['irr'])} | {P1(l['B']['params']['S3_pct'])} / {P1(l['B']['S']['S3']['res']['Base']['irr'])} |
 | Lowest pooled cash after payouts: base / downside / stress | {g['B']['S']['S1']['res']['Base']['min_cash']:.0f} / {g['B']['S']['S1']['res']['Downside']['min_cash']:.0f} / {g['B']['S']['S1']['res']['Stress']['min_cash']:.0f} | {l['B']['S']['S1']['res']['Base']['min_cash']:.0f} / {l['B']['S']['S1']['res']['Downside']['min_cash']:.0f} / {l['B']['S']['S1']['res']['Stress']['min_cash']:.0f} |
 
-**Recommend S1 (fixed 2.3x, equal instalments).** It matches your structure and is the simplest to close. **No structure passes a 1.5x test on quarterly net cash flow in every quarter** (the construction peak is net negative: GS months 39 to 48, LA 48 to 54), and with no ring-fence nothing can cure that. I disclose it, show pooled-cash coverage (at least {g['B']['S']['S1']['res']['Base']['liq_min']:.1f}x GS, {l['B']['S']['S1']['res']['Base']['liq_min']:.1f}x LA in base) and rely on Jalour's funding undertaking. At 125M GS the pooled-cash coverage is only {DS[('GS',125)]['B']['S']['S1']['res']['Base']['liq_min']:.2f}x in one quarter.
+**Recommend S1 (fixed 2.3x, equal instalments).** It matches your structure and is the simplest to close. **No structure passes a 1.5x test on quarterly net cash flow in every quarter** (the construction peak is net negative: GS months 33 to 42, LA 36 to 42), and with no ring-fence nothing can cure that. I disclose it, show pooled-cash coverage (at least {g['B']['S']['S1']['res']['Base']['liq_min']:.1f}x GS, {l['B']['S']['S1']['res']['Base']['liq_min']:.1f}x LA in base) and rely on Jalour's funding undertaking. At 125M GS the pooled-cash coverage is only {DS[('GS',125)]['B']['S']['S1']['res']['Base']['liq_min']:.2f}x in one quarter.
 Percent-of-collections share per ticket (S2): GS {', '.join(P1(DS[('GS',T)]['B']['params']['S2_pct']) for T in TK)}; LA {', '.join(P1(DS[('LA',T)]['B']['params']['S2_pct']) for T in TK)} at 50 / 75 / 100 / 125.
 
 ## What the funding gap looks like (you will fund this)
@@ -126,4 +126,5 @@ Do not guarantee the return. Offer instead: payment priority covenant (no shareh
 4. Market fact base: sent to you for review before verification.
 5. Sponsor, permit, title and landlord-consent documents: marked as provided after the investor signs an NDA.
 """
+md += "\n\n**Note (125M).** A 125M ticket means one investor placing 62.5M in each project (pack COMBINED_125M). The single-project 125 columns above are analysis only; no single-project 125M pack exists.\n"
 open(f'{OUT}/01_Structuring_Summary.md', 'w').write(md); print('ok')

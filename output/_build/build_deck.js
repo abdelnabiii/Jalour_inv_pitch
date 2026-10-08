@@ -35,7 +35,7 @@ function tbl(s, rows, x, y, w, colW, fs = 11, opts = {}) {
   s.addTable(body, { x, y, w, colW, border: { type: 'solid', pt: 0.5, color: MID }, margin: [0.04, 0.08, 0.04, 0.08], rowH: opts.rowH || 0.3, autoPage: false });
 }
 function source(s, text, y = 6.72) { s.addText('Source: ' + text, { x: 0.6, y, w: 12.1, h: 0.3, fontSize: 9, color: GREY, italic: true, margin: 0, isTextBox: true }); }
-const yr = (a) => a.map(r => 'Y' + r.year);
+const yr = (a) => a.map(r => r.year === 0 ? 'Pre' : 'Y' + r.year);
 const bal = 'The balance of project funding is provided by Jalour sponsor equity, project collections and other capital sources.';
 
 // 1 Cover
@@ -52,7 +52,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   const w = 2.9, g = 0.17, x0 = 0.6;
   stat(s, x0, 1.5, w, fmt(I.bua, 0) + ' m2', `Built-up area, ${I.height}: ${fmt(I.retail, 0)} m2 retail and ${fmt(I.office, 0)} m2 offices`);
   stat(s, x0 + (w + g), 1.5, w, `Month ${I.delivery}`, `Handover; sales from month ${I.sales_start}, construction from month ${I.con_start} for ${I.con_months} months`);
-  stat(s, x0 + 2 * (w + g), 1.5, w, 'EGP ' + fmt(I.total80 / 1000, 2) + ' bn', 'Sales plan: 80% of units sold over the sales window, at modelled prices');
+  stat(s, x0 + 2 * (w + g), 1.5, w, 'EGP ' + fmt(I.total80 / 1000, 2) + ' bn', 'Sales plan over the sales window, at modelled prices');
   stat(s, x0 + 3 * (w + g), 1.5, w, '35 / 65', 'Revenue split between the landowner (Al Ahly Sabbour) and Jalour', true);
   bullets(s, [
     `Land owned by Al Ahly Sabbour; Jalour designs, permits, builds (core and shell), markets, sells, collects and operates.`,
@@ -100,7 +100,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   tbl(s, [['Item', 'Detail'], ['Land area', fmt(I.land, 0) + ' m2'], ['Footprint (30%)', fmt(I.footprint, 0) + ' m2'], ['Height', I.height], ['Retail built-up area', fmt(I.retail, 0) + ' m2'], ['Office built-up area', fmt(I.office, 0) + ' m2'], ['Total built-up area', fmt(I.bua, 0) + ' m2'],
     ['Finishing standard', 'Core and shell'], ['Sales start', `Month ${I.sales_start}`], ['Construction', `Month ${I.con_start} to ${I.delivery} (${I.con_months} months)`], ['Handover', `Month ${I.delivery}`]], 0.6, 1.5, 6.6, [2.9, 3.7], 14, { left: true, boldFirst: true, rowH: 0.45 });
   s.addChart(pres.charts.DOUGHNUT, [{ name: 'Built-up area', labels: ['Retail', 'Offices'], values: [I.retail, I.office] }], { x: 7.6, y: 1.5, w: 5.1, h: 4.2, holeSize: 55, chartColors: [BRASS, NAVY], showLegend: true, legendPos: 'b', legendFontSize: 12, showPercent: true, showValue: false, dataLabelColor: WHITE, dataLabelFontSize: 12, showTitle: true, title: 'Built-up area mix (m2)', titleFontSize: 13, titleColor: INK });
-  source(s, 'Jalour financial model (project summary). Jalour retains 20% of units, outside the sales plan and outside this offering.', 6.6); }
+  source(s, 'Jalour financial model (project summary).', 6.6); }
 // 7 Partnership
 { const s = content('Partnership with Al Ahly Sabbour and the revenue share');
   card(s, 0.6, 1.5, 3.0, 1.3); s.addText([{ text: 'Al Ahly Sabbour', options: { bold: true, breakLine: true } }, { text: 'Landowner. Receives 35% of collections, subject to a minimum guarantee.' }], { x: 0.75, y: 1.55, w: 2.7, h: 1.2, fontSize: 12, color: INK, margin: 0, isTextBox: true, valign: 'top' });
@@ -119,26 +119,26 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
 // 9 Sales plan and pricing
 { const s = content('Sales plan and pricing');
   const tr = D.tranches; const lab = tr.map(t => 'M' + t.month);
-  s.addChart(pres.charts.BAR, [{ name: 'Retail', labels: lab, values: tr.map(t => t.comm) }, { name: 'Offices', labels: lab, values: tr.map(t => t.admin) }], { x: 0.6, y: 1.4, w: 7.4, h: 4.4, barDir: 'col', barGrouping: 'stacked', chartColors: [BRASS, NAVY], showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 11, catAxisLabelFontSize: 11, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Sales value by quarter of sale (EGP million, 80% of units)', titleFontSize: 13, titleColor: INK });
+  s.addChart(pres.charts.BAR, [{ name: 'Retail', labels: lab, values: tr.map(t => t.comm) }, { name: 'Offices', labels: lab, values: tr.map(t => t.admin) }], { x: 0.6, y: 1.4, w: 7.4, h: 4.4, barDir: 'col', barGrouping: 'stacked', chartColors: [BRASS, NAVY], showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 11, catAxisLabelFontSize: 11, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Sales value by quarter of sale (EGP million)', titleFontSize: 13, titleColor: INK });
   tbl(s, [['EGP thousand per m2', 'Launch', 'Delivery list', 'Average'], ['Retail', fmt(D.prices.launch[0], 0), fmt(D.prices.final[0], 0), fmt(D.prices.avg[0], 0)], ['Offices', fmt(D.prices.launch[1], 0), fmt(D.prices.final[1], 0), fmt(D.prices.avg[1], 0)]], 8.3, 1.6, 4.4, [1.8, 0.85, 0.85, 0.9], 12, { rowH: 0.45 });
-  bullets(s, [`Total sales at 100% of units: EGP ${fmt(I.total100, 0)} million; plan sells 80%: EGP ${fmt(I.total80, 0)} million.`, 'Payment plans: down payment 5% to 20%, a second equal payment three months later, instalments of 2 to 8 years and a delivery payment of 20% to 25%.', 'Delivery payments are collected on a contractual milestone ahead of handover (see risks).'], 8.3, 3.2, 4.4, 3.4, 12);
+  bullets(s, [`Sales plan: EGP ${fmt(I.total80, 0)} million at modelled prices; the landlord share is calculated on the full project sales value of EGP ${fmt(I.total100, 0)} million.`, 'Payment plans: down payment 5% to 20%, a second equal payment three months later, instalments of 2 to 8 years and a delivery payment of 20% to 25%.', 'Delivery payments are collected on a contractual milestone ahead of handover (see risks).'], 8.3, 3.2, 4.4, 3.4, 12);
   source(s, 'Jalour financial model (sales sheet). Prices are model assumptions; see slide 5 for market evidence.', 6.6); }
 // 10 Collections and cash flow
 { const s = content('Collections, costs and cash flow');
-  const a = D.annual.slice(0, 10); const lab = a.map(r => 'Y' + r.year);
+  const a = D.annual.slice(0, 11); const lab = a.map(r => r.year === 0 ? 'Pre-launch' : 'Y' + r.year);
   s.addChart([{ type: pres.charts.BAR, data: [{ name: 'Collections', labels: lab, values: a.map(r => r.coll) }, { name: 'Landlord payments', labels: lab, values: a.map(r => -r.land) }, { name: 'Construction, commission, SG&A', labels: lab, values: a.map(r => -r.cost) }], options: { barDir: 'col', barGrouping: 'clustered', chartColors: [NAVY, BRASS, GREY] } },
     { type: pres.charts.LINE, data: [{ name: 'Cumulative net cash flow', labels: lab, values: a.map(r => r.cum) }], options: { chartColors: [RED], lineSize: 3, lineDataSymbolSize: 7 } }],
     { x: 0.6, y: 1.4, w: 8.2, h: 5.0, showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 11, catAxisLabelFontSize: 11, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Project cash flow by project year (EGP million)', titleFontSize: 13, titleColor: INK });
   stat(s, 9.1, 1.5, 3.6, fmt(D.base.net, 0), 'Jalour net cash flow, nominal, EGP million');
   stat(s, 9.1, 3.2, 3.6, fmt(D.base.npv, 0), 'NPV at 14%, EGP million');
   stat(s, 9.1, 4.9, 3.6, fmt(F.model_peak, 1), `Peak cumulative shortage, EGP million (month ${D.base.peak_m})`);
-  source(s, 'Jalour financial model; Financial Annex, Project_CF sheet. Project years: Y1 = months 1 to 12. Excludes the 20% of units retained by Jalour.', 6.6); }
+  source(s, 'Jalour financial model; Financial Annex, Project_CF sheet. Project years: Y1 = months 1 to 12; Pre-launch = before month 1.', 6.6); }
 // 10b Combined cash position (125M packs only)
 if (D.combined) { const C = D.combined, O = C.other; const s = content(`Combined cash position: ${NAME} and ${O.name}`);
   const n = 28; const lab = C.months.slice(0, n).map(m => 'M' + m);
   s.addChart(pres.charts.LINE, [{ name: NAME, labels: lab, values: C.self_cum.slice(0, n) }, { name: O.name, labels: lab, values: C.other_cum.slice(0, n) }, { name: 'Combined', labels: lab, values: C.comb_cum.slice(0, n) }], { x: 0.6, y: 1.35, w: 6.4, h: 3.9, chartColors: [NAVY, BRASS, RED], lineSize: 2.5, lineDataSymbol: 'none', showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 10, catAxisLabelFontSize: 9, catAxisLabelFrequency: 3, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Cumulative net cash flow before investor instruments (EGP million)', titleFontSize: 12, titleColor: INK });
   const ob = C.other_base;
-  tbl(s, [['EGP million', NAME, O.name], ['Handover (month)', String(I.delivery), String(O.delivery)], ['Sales plan, 80% of units', fmt(I.total80, 0), fmt(O.total80, 0)], ['Net cash flow', fmt(D.base.net, 0), fmt(ob.net, 0)], ['NPV at 14%', fmt(D.base.npv, 0), fmt(ob.npv, 0)], ['Peak shortage (month)', fmt(-D.base.peak, 1) + ' (' + D.base.peak_m + ')', fmt(-ob.peak, 1) + ' (' + ob.peak_m + ')']], 7.3, 1.4, 5.4, [2.4, 1.5, 1.5], 11, { rowH: 0.32 });
+  tbl(s, [['EGP million', NAME, O.name], ['Handover (month)', String(I.delivery), String(O.delivery)], ['Sales plan', fmt(I.total80, 0), fmt(O.total80, 0)], ['Net cash flow', fmt(D.base.net, 0), fmt(ob.net, 0)], ['NPV at 14%', fmt(D.base.npv, 0), fmt(ob.npv, 0)], ['Peak shortage (month)', fmt(-D.base.peak, 1) + ' (' + D.base.peak_m + ')', fmt(-ob.peak, 1) + ' (' + ob.peak_m + ')']], 7.3, 1.4, 5.4, [2.4, 1.5, 1.5], 11, { rowH: 0.32 });
   const sc = C.scen; const nm = ['Base case', 'Delivery payments at handover', 'Collections slip 2 quarters', 'Downside: sales +12 months, prices -10%'];
   const labs = ['Base', 'Delivery payments at handover', 'Collections slip 2 quarters', 'Sales +12 months, prices -10%'];
   tbl(s, [['Peak shortage (EGP m)', NAME.split(' ')[0], O.name.split(' ')[0], 'Combined']].concat(nm.map((k, i) => [labs[i], fmt(-sc[k].self_peak, 0), fmt(-sc[k].other_peak, 0), fmt(-sc[k].comb_peak, 0)])), 7.3, 3.55, 5.4, [2.4, 1.0, 1.0, 1.0], 11, { rowH: 0.32 });
@@ -200,15 +200,15 @@ if (D.combined) { const C = D.combined, O = C.other; const s = content(`Combined
 // 16 Timeline
 { const s = content('Timeline and milestones');
   const ms = [[I.sales_start, 'Sales start'], [I.con_start, 'Construction start'], [B.pay_months[0] - 3 - 24 + 24, 'Option B grace ends'], [I.delivery, 'Handover'], [I.delivery + 3, 'First unit resales'], [B.pay_months[11], 'Last Option B payment']];
-  const x0 = 0.9, x1 = 12.4, mmax = Math.max(B.pay_months[11], I.delivery + 12) + 3; const X = m => x0 + (x1 - x0) * m / mmax;
+  const x0 = 0.9, x1 = 12.4, mmax = Math.max(B.pay_months[11], I.delivery + 12) + 3; const mmin = Math.min(D.t0, 0) - 3; const X = m => x0 + (x1 - x0) * (m - mmin) / (mmax - mmin);
   s.addShape(pres.shapes.LINE, { x: x0, y: 3.4, w: x1 - x0, h: 0, line: { color: NAVY, width: 2 } });
-  const all = [[0, 'Model start'], [D.info.sales_start, 'Sales start'], [I.con_start, 'Construction start'], [D.B.pay_months[0] - 3, 'Grace ends'], [B.pay_months[0], 'First Option B payment'], [I.delivery, 'Handover'], [I.delivery + 3, 'First resales'], [B.pay_months[11], 'Last Option B payment']];
+  const all = [[D.t0, 'Funding'], [D.info.sales_start, 'Sales start'], [I.con_start, 'Construction start'], [D.B.pay_months[0] - 3, 'Grace ends'], [B.pay_months[0], 'First Option B payment'], [I.delivery, 'Handover'], [I.delivery + 3, 'First resales'], [B.pay_months[11], 'Last Option B payment']];
   all.sort((a, b) => a[0] - b[0]); const seen = new Set();
   all.forEach((m, i) => { const up = i % 2 === 0; const x = X(m[0]);
     s.addShape(pres.shapes.OVAL, { x: x - 0.09, y: 3.31, w: 0.18, h: 0.18, fill: { color: BRASS }, line: { color: WHITE, width: 1 } });
     s.addText([{ text: m[1], options: { bold: true, breakLine: true } }, { text: 'Month ' + m[0] }], { x: x - 0.85, y: up ? 2.3 : 3.65, w: 1.7, h: 0.9, fontSize: 11, color: INK, align: 'center', valign: up ? 'bottom' : 'top', margin: 0, isTextBox: true }); });
-  bullets(s, [`Funding and signing: month ${D.info.sales_start > 0 ? (D.k === 'GS' ? 3 : 12) : 0} (ticket due when the down payment of EGP ${fmt(I.dp, 0)} million falls due).`, `Option A: units are allocated at signing and delivered at handover (month ${I.delivery}); the investor may resell after consents.`, `Option B: 24-month grace, then 12 quarterly instalments from month ${B.pay_months[0]}.`], 0.6, 4.9, 12.1, 1.6, 13);
-  source(s, 'Jalour financial model; Financial Annex. Months count from the start of the model timeline.', 6.65); }
+  bullets(s, [`Funding and signing: month ${D.t0} (ticket due when the down payment of EGP ${fmt(I.dp, 0)} million falls due).`, `Option A: units are allocated at signing and delivered at handover (month ${I.delivery}); the investor may resell after consents.`, `Option B: 24-month grace, then 12 quarterly instalments from month ${B.pay_months[0]}.`], 0.6, 4.9, 12.1, 1.6, 13);
+  source(s, 'Jalour financial model; Financial Annex. Months count from this project\'s sales launch (month 1).', 6.65); }
 // 17 Ask
 { const s = pres.addSlide({ masterName: 'DARK' }); sn++;
   s.addText('The ask and next steps', { x: 0.8, y: 0.7, w: 11.5, h: 0.9, fontFace: 'Cambria', fontSize: 34, bold: true, color: WHITE, margin: 0, isTextBox: true });

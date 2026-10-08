@@ -12,5 +12,6 @@ def build(Te=62.5):
     info['dd'] = gen_dd_combined.build_dd_combined(f'{FOLDER}/DD_Memo.docx', Te)['pages']
     gen_nda.build(f'{FOLDER}/NDA_Template.docx', ["Green Square", "L'avenir"])
     for f in ('Investment_Memo', 'DD_Memo', 'NDA_Template'): subprocess.run(['python3', 'fix_docx.py', f'{FOLDER}/{f}.docx'])
+    for f in ('Deck.pptx', 'Investment_Memo.docx', 'DD_Memo.docx', 'NDA_Template.docx'): subprocess.run(['soffice', '--headless', '--convert-to', 'pdf', '--outdir', FOLDER, f'{FOLDER}/{f}'], capture_output=True)
     return info
 if __name__ == '__main__': print(build())

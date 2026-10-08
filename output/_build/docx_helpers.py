@@ -8,7 +8,9 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 NAVY = RGBColor(0x17, 0x32, 0x4D); BRASS = RGBColor(0xB8, 0x89, 0x3B); GREY = RGBColor(0x6B, 0x72, 0x80); INK = RGBColor(0x1B, 0x1F, 0x2A)
 def fmt(x, d=1):
-    return 'n/a' if x is None or x != x else f'{x:,.{d}f}'
+    if x is None or x != x: return 'n/a'
+    s = f'{x:,.{d}f}'
+    return s[1:] if s.startswith('-') and float(s.replace(',', '')) == 0 else s
 def pct(x, d=1): return 'n/a' if x is None or x != x else f'{x*100:.{d}f}%'
 def mx(x, d=2): return f'{x:.{d}f}x'
 def shade(cell, hexcolor):

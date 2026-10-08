@@ -14,6 +14,7 @@ def build(k, T):
     info['memo'] = gen_memo.build_memo(k, T, f'{folder}/Investment_Memo.docx', work); info['dd'] = gen_dd.build_dd(k, T, f'{folder}/DD_Memo.docx')
     gen_nda.build(f'{folder}/NDA_Template.docx', [PD.INFO[k]['name']])
     for f in ('Investment_Memo', 'DD_Memo', 'NDA_Template'): subprocess.run(['python3', 'fix_docx.py', f'{folder}/{f}.docx'])
+    for f in ('Deck.pptx', 'Investment_Memo.docx', 'DD_Memo.docx', 'NDA_Template.docx'): subprocess.run(['soffice', '--headless', '--convert-to', 'pdf', '--outdir', folder, f'{folder}/{f}'], capture_output=True)
     return info
 if __name__ == '__main__':
     k, T = sys.argv[1], int(sys.argv[2]); i = build(k, T); print(json.dumps({a: (b if not isinstance(b, dict) else {c: d for c, d in b.items() if c != 'pdf'}) for a, b in i.items()}, default=str)[:600])

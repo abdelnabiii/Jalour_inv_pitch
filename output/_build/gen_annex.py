@@ -17,7 +17,7 @@ def qc(i): return CL(3+i)           # quarter i (1..60) -> column D..BK
 FIRST, LAST = qc(1), qc(NQ_)
 def rng(row, sheet=None): return (f"'{sheet}'!" if sheet else '') + f"${FIRST}${row}:${LAST}${row}"
 def make_annex(k, T, path):
-    I = PD.INFO[k]; p = P[k]; Lh = launch(k); b = series(k); name = I['name']
+    I = PD.INFO_OWN[k]; p = dict(P[k], t0=PD.own(k, P[k]['t0'])); OFFk = PD.OFF[k]; Lh = launch(k); b = series(k); name = I['name']
     wb = openpyxl.Workbook(); wb.remove(wb.active)
     wb.properties.title = f'Financial Annex - {name} - Ticket {T}m'; wb.properties.creator = 'Jalour Developments'; wb.properties.subject = 'Confidential'; wb.properties.keywords = ''
     def sh(n, title, sub=None):
@@ -52,7 +52,8 @@ def make_annex(k, T, path):
     inp('B_mult', 'Option B: total cash return multiple', M_B2, 'x', 'Offer term (Option B)', X)
     inp('grace', 'Option B: grace period', GRACE_M, 'months', 'Offer term', '0')
     inp('n_pay', 'Option B: number of quarterly payouts', PAY_Q, 'quarters', 'Offer term (3 years)', '0')
-    inp('t0', 'Investor funding month (t0)', p['t0'], 'month', f"ASSUMPTION: month the down payment falls due in the model ('Net Cash Flow -With DP' row {10 if k=='GS' else 11})", '0')
+    inp('off', 'Calendar offset: months removed so that month 1 is this project\'s own sales launch', OFFk, 'months', 'Standalone model: Assumptions!C15 (calendar offset removed from the shared timeline)', '0')
+    inp('t0', 'Investor funding month (t0)', p['t0'], 'month', f"ASSUMPTION: month the landlord down payment falls due (first column of 'Net Cash Flow -With DP', own timeline)", '0')
     inp('handover', 'Project handover month', I['delivery'], 'month', f"Source model, {name} Summary!E4", '0')
     inp('disc', 'Discount rate', 0.14, '% p.a.', "Source model, sales sheet cell C72 (labelled Cost Of Capital); kept at 14% by Jalour", PC)
     inp('fric', 'Option A: investor resale friction', FRICTION, '%', 'ASSUMPTION: broker plus developer transfer fee', PC)
@@ -61,7 +62,7 @@ def make_annex(k, T, path):
     inp('ll', 'Landlord share of collections', LL, '%', 'Offers DP!C5', PC)
     inp('minG', 'Landlord minimum guarantee', p['minG'], 'EGP m', 'Offers DP!C3' if k == 'GS' else 'Offers DP!D3', N1)
     inp('dp', 'Down payment to landlord (10% of guarantee)', p['dp'], 'EGP m', 'Offers DP!C9' if k == 'GS' else 'Offers DP!D9', N1)
-    inp('list100', 'Total sales value at 100% of units', p['list100'], 'EGP m', 'Summary C27 (sold 80% plus retained 20% at modelled prices)', N1)
+    inp('list100', 'Full project sales value (basis of the landlord share)', p['list100'], 'EGP m', 'Summary C27 (at modelled prices)', N1)
     inp('comm_rate', 'Sales commission rate', COMM, '%', 'Summary B19', PC)
     inp('prof_fee', 'Professional fees (% of construction cost)', 0.05, '%', "Cash Out Detail!C49", PC)
     inp('precon_share', 'Share of professional fees incurred before construction start', 0.30, '%', 'ASSUMPTION: the model has no pre-construction cost; to be confirmed', PC)
@@ -70,7 +71,7 @@ def make_annex(k, T, path):
     inp('pl_a', 'Launch list price, offices', Lh['p0'][1], 'EGP k / m2', 'First sales column, row 4', '#,##0')
     inp('pf_c', 'Delivery list price, retail (last list price in the plan)', Lh['fin'][0], 'EGP k / m2', 'Last sales column, row 3', '#,##0')
     inp('pf_a', 'Delivery list price, offices (last list price in the plan)', Lh['fin'][1], 'EGP k / m2', 'Last sales column, row 4', '#,##0')
-    inp('Vc', 'Launch tranches: retail sales value at list', Lh['Vc'], 'EGP m', f"First two sales tranches (months {Lh['months'][0]} and {Lh['months'][1]}), row 24", N1)
+    inp('Vc', 'Launch tranches: retail sales value at list', Lh['Vc'], 'EGP m', f"First two sales tranches (months {Lh['months'][0]-OFFk} and {Lh['months'][1]-OFFk}), row 24", N1)
     inp('Va', 'Launch tranches: office sales value at list', Lh['Va'], 'EGP m', 'Same tranches, row 25', N1)
     inp('appr', 'Price appreciation launch to delivery list (value-weighted)', f"=({ref['Vc'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_c'].split('!')[1]}/{ref['pl_c'].split('!')[1]})+({ref['Va'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_a'].split('!')[1]}/{ref['pl_a'].split('!')[1]})", 'x', 'Calculated. Investor resale value = face x this factor (base)', '0.0000', True)
     sec('Option B alternatives (considered, not recommended)')
@@ -87,7 +88,7 @@ def make_annex(k, T, path):
     inp('ref_net', 'Jalour net cash flow, nominal', m['net'], 'EGP m', "'Net Cash Flow -With DP'!C40" if k == 'GS' else "'Net Cash Flow -With DP'!C41", '#,##0.000000')
     inp('ref_npv', 'NPV of net cash flow with down payment', m['npv'], 'EGP m', 'Summary!D9' if k == 'GS' else 'Summary!D10', '#,##0.000000')
     inp('ref_peak', 'Peak cumulative cash shortage', m['peak'], 'EGP m', f"{name} Summary!E7", '#,##0.000000')
-    inp('ref_coll', 'Total collections (80% of units sold)', m['coll'], 'EGP m', "'Net Cash Flow -With DP'!C4" if k == 'GS' else "'Net Cash Flow -With DP'!C5", '#,##0.000000')
+    inp('ref_coll', 'Total collections', m['coll'], 'EGP m', "'Net Cash Flow -With DP'!C4" if k == 'GS' else "'Net Cash Flow -With DP'!C5", '#,##0.000000')
     inp('ref_land', 'Total landlord payments', m['land'], 'EGP m', "'Net Cash Flow -With DP'!C10" if k == 'GS' else "'Net Cash Flow -With DP'!C11", '#,##0.000000')
     inp('ref_cost', 'Total construction, commission and SG&A', m['cost'], 'EGP m', "'Net Cash Flow -With DP'!C28" if k == 'GS' else "'Net Cash Flow -With DP'!C29", '#,##0.000000')
     inp('usd', 'USD exchange rate (executive summary only)', 48.0, 'EGP per USD', 'Brief / model', '0.00')
@@ -118,7 +119,7 @@ def make_annex(k, T, path):
         for i in range(1, NQ_+1):
             c = wsS[f'{qc(i)}{row}']
             if key == 'idx': c.value = i; c.font = F_N
-            elif key == 'month': c.value = f'={qc(i)}{S["idx"]}*3'; c.font = F_N
+            elif key == 'month': c.value = f'={qc(i)}{S["idx"]}*3-{R("off")}'; c.font = F_N
             else: c.value = float(vals[key][i-1]); c.font = F_IN; c.number_format = N2
         if key not in ('idx', 'month'):
             wsS.cell(row, 3, f'=SUM({FIRST}{row}:{LAST}{row})').number_format = N2; wsS.cell(row, 3).font = F_B
@@ -131,7 +132,7 @@ def make_annex(k, T, path):
     wsP = sh('Project_CF', f'{name}: project cash flow to Jalour, base case (quarterly, as per the source model)', 'Net cash flow = collections less landlord payments, construction, commission and SG&A. Positive = cash in.')
     hdr(wsP, 4, ['Line (EGP m)', 'Unit', 'Total'] + [''] * NQ_)
     P_ = {n: 5+j for j, n in enumerate(['idx', 'month', 't', 'coll', 'land', 'cons', 'comm', 'sga', 'net', 'cum', 'df', 'pv'])}
-    labels = {'idx': 'Quarter', 'month': 'Month', 't': 'Years from month 0', 'coll': 'Collections (80% of units sold)', 'land': 'Landlord payments (35% share, guarantee, down payment)', 'cons': 'Construction cost', 'comm': 'Sales commission', 'sga': 'SG&A and others',
+    labels = {'idx': 'Quarter', 'month': 'Month', 't': 'Years from month 0', 'coll': 'Collections', 'land': 'Landlord payments (35% share, guarantee, down payment)', 'cons': 'Construction cost', 'comm': 'Sales commission', 'sga': 'SG&A and others',
               'net': 'Net cash flow', 'cum': 'Cumulative net cash flow', 'df': 'Discount factor', 'pv': 'Present value of net cash flow'}
     for key, row in P_.items():
         wsP.cell(row, 1, labels[key]).font = F_B if key in ('net', 'cum') else F_N
@@ -389,7 +390,7 @@ def make_annex(k, T, path):
             wsK.cell(r_, 1, t_).font = F_B; c = wsK.cell(r_, 2, f_); c.number_format = fm; c.font = F_B; c.fill = FILL_K
         wsK.cell(15, 1, f'{oname}: facts and totals').font = F_B
         ob0 = C0['other_base']; Io0 = C0['other']
-        facts_ = [(16, 'Handover (project month)', Io0['delivery'], '0', 'Source model', True), (17, 'Landlord minimum guarantee', Io0['guarantee'], N1, 'Source model, Offers DP', True), (18, 'Sales plan, 80% of units', Io0['total80'], N1, 'Source model', True), (19, 'Collections', ob0['coll'], N1, "Source model, 'Net Cash Flow -With DP'", True), (20, 'Landlord payments', ob0['land'], N1, "Source model, 'Net Cash Flow -With DP'", True), (21, 'Construction, commission and SG&A', ob0['cost'], N1, "Source model, 'Net Cash Flow -With DP'", True),
+        facts_ = [(16, 'Handover (project month)', Io0['delivery'], '0', 'Source model', True), (17, 'Landlord minimum guarantee', Io0['guarantee'], N1, 'Source model, Offers DP', True), (18, 'Sales plan', Io0['total80'], N1, 'Source model', True), (19, 'Collections', ob0['coll'], N1, "Source model, 'Net Cash Flow -With DP'", True), (20, 'Landlord payments', ob0['land'], N1, "Source model, 'Net Cash Flow -With DP'", True), (21, 'Construction, commission and SG&A', ob0['cost'], N1, "Source model, 'Net Cash Flow -With DP'", True),
                   (22, 'Net cash flow, nominal', f'=C7', N1, 'Calculated', False), (23, 'NPV at discount rate', f'=SUMPRODUCT({FIRST}7:{LAST}7,{PR("df")})', N1, 'Calculated, same discount factors', False), (24, 'Peak cumulative shortage', f'=MIN({FIRST}8:{LAST}8)', N1, 'Calculated', False)]
         for r_, t_, v_, fm, sr, inp_ in facts_:
             wsK.cell(r_, 1, t_).font = F_N; c = wsK.cell(r_, 2, v_); c.number_format = fm; c.font = F_IN if inp_ else F_B; wsK.cell(r_, 3, sr).font = F_NOTE
@@ -428,7 +429,7 @@ def make_annex(k, T, path):
     sub('Project (base case)')
     srow('net', 'Jalour net cash flow, nominal (EGP m)', f"={PK['net']}", N1, True, 'Project_CF'); srow('npv', 'NPV of net cash flow @ 14% (EGP m)', f"={PK['npv']}", N1, True, 'Project_CF')
     srow('peak', 'Peak cumulative cash shortage (EGP m)', f"=-{PK['peak']}", N1, True, 'Project_CF'); srow('peak_m', 'Month of peak shortage', f"={PK['peak_m']}", '0', False, 'Project_CF')
-    srow('coll', 'Total collections, 80% of units sold (EGP m)', f"=Project_CF!$C${P_['coll']}", N1, True, 'Project_CF'); srow('land', 'Landlord payments (EGP m)', f"=Project_CF!$C${P_['land']}", N1, False, 'Project_CF')
+    srow('coll', 'Total collections (EGP m)', f"=Project_CF!$C${P_['coll']}", N1, True, 'Project_CF'); srow('land', 'Landlord payments (EGP m)', f"=Project_CF!$C${P_['land']}", N1, False, 'Project_CF')
     srow('cost', 'Construction, commission and SG&A (EGP m)', f"=Project_CF!$C${P_['cons']}+Project_CF!$C${P_['comm']}+Project_CF!$C${P_['sga']}", N1, False, 'Project_CF')
     sub('Funding plan')
     srow('uses', 'Total uses at peak (EGP m)', f"=Sources_Uses!B{U['tot']}", N1, True, 'Sources_Uses'); srow('bal', 'Balance of project funding (EGP m)', f"=Sources_Uses!B{U['bal']}", N1, False, 'Sources_Uses')

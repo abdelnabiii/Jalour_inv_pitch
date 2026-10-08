@@ -103,7 +103,7 @@ def run(k, T):
                     hard += 1
     rep.append(f'Hard-coded numeric cells on calculation sheets (excluding blue scenario parameters): {hard}\n')
     # 2 arithmetic
-    t = [m/12 for m in [3*(i+1) for i in range(60)]]
+    t = [(3*(i+1)-PD.OFF[k])/12 for i in range(60)]
     def row_vals(sheet, r): ws = wb[sheet]; return [ws.cell(r, 4+i).value or 0 for i in range(60)]
     chk = []
     inv = row_vals('Option_A', 17); chk.append(('Option A investor IRR', indep_irr(inv, t), S['a_irr'], 1e-4))
@@ -129,11 +129,18 @@ def run(k, T):
     rep.append(f'\nPython engine vs spreadsheet reconciliation sheet: {S and cell("Reconciliation!$D$" + str(wb["Reconciliation"].max_row))}\n'); fails += bad
     # 3 disclosure scan
     other = ["L'avenir", 'L’avenir', 'Lavenir', "L'AVENIR", 'LA_0', 'LA_1'] if k == 'GS' else ['Green Square', 'GREEN SQUARE', 'GS_0', 'GS_1']
-    pats = other + ['AT' + ' EAST', 'At' + ' East', 'AT' + ' East', '250M', '250 M', '250 million', '250,000,000', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise']
+    pats = other + ['retain', 'Retain', 'RETAIN', 'AT' + ' EAST', 'At' + ' East', 'AT' + ' East', '250M', '250 M', '250 million', '250,000,000', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise']
     rep.append('## 3. Disclosure scan (every file, including document properties, notes, hidden sheets and comments)\n\n| File | Parts scanned | Prohibited hits | Bare "250" contexts |\n|---|---|---|---|')
     hits_total = 0
     for f in sorted(glob.glob(folder + '/*')):
-        z = zipfile.ZipFile(f); parts = 0; hits = []; bare = []; allowed = []
+        parts = 0; hits = []; bare = []; allowed = []
+        if f.endswith('.pdf'):
+            import subprocess; tx = subprocess.run(['pdftotext', f, '-'], capture_output=True, text=True).stdout; parts = 1
+            for p_ in pats:
+                if p_ in tx: hits.append(f'{p_} in pdf text')
+            for m_ in re.finditer(r'.{25}\b250\b.{25}', tx): bare.append(f'pdf: ...{m_.group(0).strip()}...')
+            hits_total += len(hits); rep.append(f'| {os.path.basename(f)} | {parts} | {len(hits)} {"; ".join(hits[:5])} | {len(bare)} {" | ".join(bare[:3])} |'); continue
+        z = zipfile.ZipFile(f)
         for nme in z.namelist():
             if not nme.endswith(('.xml', '.rels', '.txt', '.json')): continue
             try: tx = z.read(nme).decode('utf8', 'ignore')
