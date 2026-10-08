@@ -69,6 +69,13 @@ for k in ('GS', 'LA'):
 ws = sheet('Assumptions_Log', 'Assumptions (confirm)')
 table(ws, 3, ['Ref', 'Assumption'], [['A1', 'Investor funds 100% at t0 (GS M3, LA M12); pooled with project cash, no restricted account.'], ['A2', 'Launch list = price list at the first sales tranche. Units come from the first two tranches (same price list).'], ['A3', 'Investor resale at final list price, 3% cost, four quarters from handover+3m.'], ['A4', 'Jalour cost of Option A = ticket received vs forgone launch-tranche collections plus commission saved; landlord payments unchanged.'],
     ['A5', 'Pre-construction cost 10.5 (30% of the 5% professional-fee line).'], ['A6', 'Downside: collections and commission +12 months, prices -10%; guarantee and construction timing unchanged.'], ['A7', 'Option B 2.3x per your instruction; no tuning to a target IRR.'], ['A8', 'Coverage "cash available" includes the ticket as pooled cash.']], None, [8, 150])
+
+ws = sheet('Combined_Position', 'INTERNAL ONLY: combined Green Square + L\'avenir cash position (Jalour level). Never include in any investor pack.', 'Cumulative net cash flow before any investor instrument, EGP million, base case, from the edited source model.')
+import engine as EN
+gs, la = EN.series('GS')['cum'], EN.series('LA')['cum']
+rows = [[int(m), float(gs[i]), float(la[i]), float(gs[i]+la[i])] for i, m in enumerate(EN.MONTHS[:43])]
+r_end = table(ws, 4, ['Month', 'Green Square cumulative', "L'avenir cumulative", 'Combined cumulative'], rows, ['0', N1, N1, N1], [10, 22, 22, 22])
+mn = min(rows, key=lambda x: x[3]); ws.cell(r_end+1, 1, f'Lowest combined position: {mn[3]:.1f} at month {mn[0]} (Green Square alone {min(r[1] for r in rows):.1f}; L\'avenir alone {min(r[2] for r in rows):.1f}).').font = BF
 wb.save(f'{OUT}/01_Structuring_Analysis.xlsx')
 # summary md
 g = DS[('GS', 100)]; l = DS[('LA', 100)]
