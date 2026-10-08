@@ -85,9 +85,9 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
 // 5 Market pricing and macro
 { const s = content('Market: pricing evidence and demand drivers');
   tbl(s, [['Indicator', 'Evidence', 'Model assumption'],
-    ['Office prices', 'Mostakbal City listings: EGP 106,000 to 120,000 per m2 (asking)', `Launch EGP ${fmt(D.prices.launch[1] * 1000, 0)} per m2, rising to ${fmt(D.prices.final[1] * 1000, 0)} at the final list`],
+    ['Office prices', 'Mostakbal City listings: EGP 106,000 to 120,000 per m2 (asking)', `Launch EGP ${fmt(D.prices.launch[1] * 1000, 0)} per m2, rising to ${fmt(D.prices.final[1] * 1000, 0)} at the delivery list`],
     ['Retail prices', 'New Cairo listings: EGP 139,000 to 325,000 per m2 (asking, individual listings)', `Launch EGP ${fmt(D.prices.launch[0] * 1000, 0)} per m2, rising to ${fmt(D.prices.final[0] * 1000, 0)}`],
-    ['Price growth', 'New Cairo secondary prices +3.1% y/y (Q1 2026); broker estimates 10 to 16% a year for 2026', `Launch to final list: +${fmt((D.prices.final[0] / D.prices.launch[0] - 1) * 100, 0)}% retail, +${fmt((D.prices.final[1] / D.prices.launch[1] - 1) * 100, 0)}% offices over the sales window`],
+    ['Price growth', 'New Cairo secondary prices +3.1% y/y (Q1 2026); broker estimates 10 to 16% a year for 2026', `Launch to delivery list: +${fmt((D.prices.final[0] / D.prices.launch[0] - 1) * 100, 0)}% retail, +${fmt((D.prices.final[1] / D.prices.launch[1] - 1) * 100, 0)}% offices; offices +${fmt(D.pricecmp.off_vs_ask * 100, 0)}% on today's asking, about ${fmt(D.pricecmp.off_cagr * 100, 0)}% a year`],
     ['Interest rates', 'CBE overnight deposit rate 19.00% (Sep 2026); urban inflation 14.5% (Aug 2026)', 'Discount rate 14% in the model'],
     ['Developer sales', 'Top 10 developers EGP 670 bn in H1 2026, +2.9% y/y; units sold -5%', 'Sales over about 3 years from launch'],
     ['Payment plans', 'Typically 8 to 12 years with 1.5% to 10% down payment', 'Down payments 5% to 20%; instalments 2 to 8 years']],
@@ -111,15 +111,15 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
 // 8 Jalour
 { const s = content('Jalour Developments: role and track record');
   card(s, 0.6, 1.5, 5.9, 4.9); s.addText('Role in this project', { x: 0.8, y: 1.6, w: 5.5, h: 0.4, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
-  bullets(s, ['Design and permits', 'Construction to core-and-shell standard', 'Marketing, branding and sales', 'Collection of instalments', 'Operation, management and maintenance, directly or through a facility management company', 'Funds project funding gaps from sponsor equity or other capital sources (to be documented)'], 0.8, 2.1, 5.5, 4.2, 14);
+  bullets(s, ['Design and permits', 'Construction to core-and-shell standard', 'Marketing, branding and sales', 'Collection of instalments', 'Operation, management and maintenance, directly or through a facility management company', 'Covers project funding gaps from its cash reserves and cash from other projects it is constructing (to be documented)'], 0.8, 2.1, 5.5, 4.2, 14);
   card(s, 6.8, 1.5, 5.9, 4.9, 'FBF3E4'); s.addText('Track record and team', { x: 7.0, y: 1.6, w: 5.5, h: 0.4, fontSize: 16, bold: true, color: BRASS, margin: 0, isTextBox: true });
-  bullets(s, ['[To be provided by Jalour: completed projects, area delivered and units handed over]', '[To be provided by Jalour: management team biographies]', '[To be provided by Jalour: audited financial statements of Jalour and Al Jalal Holding]', '[To be provided by Jalour: references from landlords, contractors and buyers]'], 7.0, 2.1, 5.5, 4.2, 14);
-  source(s, 'Jalour Developments is the real estate arm of Al Jalal Holding, Cairo. Placeholders in brackets are pending from Jalour.', 6.6); }
+  bullets(s, ['Completed projects, area delivered and units handed over', 'Management team biographies', 'Audited financial statements of Jalour and Al Jalal Holding', 'References from landlords, contractors and buyers', 'All provided after the investor signs a non-disclosure agreement'], 7.0, 2.1, 5.5, 4.2, 14);
+  source(s, 'Jalour Developments is the real estate arm of Al Jalal Holding, Cairo. Sponsor materials are provided after the investor signs a non-disclosure agreement.', 6.6); }
 // 9 Sales plan and pricing
 { const s = content('Sales plan and pricing');
   const tr = D.tranches; const lab = tr.map(t => 'M' + t.month);
   s.addChart(pres.charts.BAR, [{ name: 'Retail', labels: lab, values: tr.map(t => t.comm) }, { name: 'Offices', labels: lab, values: tr.map(t => t.admin) }], { x: 0.6, y: 1.4, w: 7.4, h: 4.4, barDir: 'col', barGrouping: 'stacked', chartColors: [BRASS, NAVY], showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 11, catAxisLabelFontSize: 11, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Sales value by quarter of sale (EGP million, 80% of units)', titleFontSize: 13, titleColor: INK });
-  tbl(s, [['EGP thousand per m2', 'Launch', 'Final', 'Average'], ['Retail', fmt(D.prices.launch[0], 0), fmt(D.prices.final[0], 0), fmt(D.prices.avg[0], 0)], ['Offices', fmt(D.prices.launch[1], 0), fmt(D.prices.final[1], 0), fmt(D.prices.avg[1], 0)]], 8.3, 1.6, 4.4, [1.8, 0.85, 0.85, 0.9], 12, { rowH: 0.45 });
+  tbl(s, [['EGP thousand per m2', 'Launch', 'Delivery list', 'Average'], ['Retail', fmt(D.prices.launch[0], 0), fmt(D.prices.final[0], 0), fmt(D.prices.avg[0], 0)], ['Offices', fmt(D.prices.launch[1], 0), fmt(D.prices.final[1], 0), fmt(D.prices.avg[1], 0)]], 8.3, 1.6, 4.4, [1.8, 0.85, 0.85, 0.9], 12, { rowH: 0.45 });
   bullets(s, [`Total sales at 100% of units: EGP ${fmt(I.total100, 0)} million; plan sells 80%: EGP ${fmt(I.total80, 0)} million.`, 'Payment plans: down payment 5% to 20%, a second equal payment three months later, instalments of 2 to 8 years and a delivery payment of 20% to 25%.', 'Delivery payments are collected on a contractual milestone ahead of handover (see risks).'], 8.3, 3.2, 4.4, 3.4, 12);
   source(s, 'Jalour financial model (sales sheet). Prices are model assumptions; see slide 5 for market evidence.', 6.6); }
 // 10 Collections and cash flow
@@ -142,7 +142,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   tbl(s, srcRows, 6.9, 1.5, 5.8, [3.4, 1.2, 1.2], 13, { rowH: 0.55 });
   const lines = [bal, `Modelled peak cumulative shortage EGP ${fmt(F.model_peak, 1)} million; the ticket is ${pct(F.share_peak, 0)} of it.`];
   if (F.excess_over_peak > 0) lines.push(`The ticket exceeds the modelled peak by EGP ${fmt(F.excess_over_peak, 1)} million. The excess is general project liquidity: it absorbs the timing risk on delivery payments (peak shortage EGP ${fmt(F.stress_peak, 0)} million if they arrive at handover). It is not held in a restricted account.`);
-  else lines.push(`If delivery payments arrive at handover the peak shortage is EGP ${fmt(F.stress_peak, 0)} million; if sales slip 12 months with prices 10% lower it is EGP ${fmt(F.downside_peak, 0)} million. Jalour will fund gaps above project cash.`);
+  else lines.push(`If delivery payments arrive at handover the peak shortage is EGP ${fmt(F.stress_peak, 0)} million; if sales slip 12 months with prices 10% lower it is EGP ${fmt(F.downside_peak, 0)} million. Jalour will cover gaps above project cash from its cash reserves and cash from other projects it is constructing.`);
   lines.push('Nothing in this structure is ring-fenced: the ticket is project funding.');
   bullets(s, lines, 0.6, 4.6, 12.1, 2.0, 13);
   source(s, 'Financial Annex, Sources_Uses sheet. Pre-construction cost is an assumption pending Jalour\'s budget.', 6.65); }
@@ -151,7 +151,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   tbl(s, [['', 'Option A: units', 'Option B: cash'],
     ['Entitlement', `Units with a face value of EGP ${fmt(A.face, 0)} million (2.0x) at launch list`, `EGP ${fmt(B.mult * T, 0)} million (${mx(B.mult, 1)}) in cash`],
     ['Timing', `Allocation at signing; handover month ${I.delivery}; resale from month ${I.delivery + 3}`, `Grace 24 months; 12 quarterly instalments, months ${B.pay_months[0]} to ${B.pay_months[11]}`],
-    ['Price exposure', `Yes: value moves with Mostakbal City prices (final list ${fmt(A.appr, 2)}x launch)`, 'No unit price exposure; fixed instalments'],
+    ['Price exposure', `Yes: value moves with Mostakbal City prices (delivery list ${fmt(A.appr, 2)}x launch)`, 'No unit price exposure; fixed instalments'],
     ['Projected IRR, base', pct(A.inv.Base.irr), pct(S1.Base.irr)],
     ['Projected multiple, base', mx(A.inv.Base.moic), mx(S1.Base.moic)],
     ['Upside IRR', pct(A.inv.Upside.irr) + ` (${mx(A.inv.Upside.moic)})`, 'Contractual: ' + pct(S1.Upside.irr) + ' if paid'],
@@ -162,7 +162,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
 // 13 Security
 { const s = content('Security package and investor protections');
   card(s, 0.6, 1.5, 5.9, 4.9); s.addText('Proposed base package', { x: 0.8, y: 1.6, w: 5.5, h: 0.4, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
-  bullets(s, ['Option A: a registered allocation of specific units from the first two sales tranches; the units are the investor\'s asset', 'Option B: earmark of specific unsold units with a list value of at least the ticket, with a right to substitute equal value', 'Payment priority covenant: no shareholder distributions or shareholder-loan repayments while an instalment is overdue', 'Negative pledge on the earmarked units', 'Information rights: monthly reporting and audit rights', 'Sponsor funding undertaking for project funding gaps; no guarantee of return'], 0.8, 2.1, 5.5, 4.2, 13);
+  bullets(s, ['Option A: a registered allocation of specific units from the first two sales tranches; the units are the investor\'s asset', 'Option B: earmark of specific unsold units with a list value of at least the ticket, with a right to substitute equal value', 'Payment priority covenant: no shareholder distributions or shareholder-loan repayments while an instalment is overdue', 'Negative pledge on the earmarked units', 'Information rights: monthly reporting and audit rights', 'Sponsor funding undertaking for project gaps from Jalour cash reserves and other projects\' cash; no guarantee of return'], 0.8, 2.1, 5.5, 4.2, 13);
   card(s, 6.8, 1.5, 5.9, 4.9, 'FBF3E4'); s.addText('Optional and for counsel', { x: 7.0, y: 1.6, w: 5.5, h: 0.4, fontSize: 16, bold: true, color: BRASS, margin: 0, isTextBox: true });
   bullets(s, ['Promissory note or post-dated cheques for each Option B instalment (common practice in Egypt)', 'Independent engineer reporting on construction progress', 'Step-in right to market the earmarked units after a payment default', 'Landlord acknowledgement of the unit allocation', 'Parent guarantee: not offered in this structure'], 7.0, 2.1, 5.5, 4.2, 13);
   source(s, 'Proposal for review by Jalour\'s lawyers. Landlord consent is required for any allocation or encumbrance affecting its 35% share.', 6.6); }
@@ -171,13 +171,13 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   s.addChart(pres.charts.BAR, [{ name: 'Investor IRR', labels: ['Option A base', 'Option A downside', 'Option A upside', 'Option B (contractual)'], values: [A.inv.Base.irr * 100, A.inv.Downside.irr * 100, A.inv.Upside.irr * 100, S1.Base.irr * 100] }], { x: 0.6, y: 1.4, w: 5.9, h: 3.6, barDir: 'col', chartColors: [NAVY], showValue: true, dataLabelFormatCode: '0.0"%"', dataLabelFontSize: 11, dataLabelColor: INK, dataLabelPosition: 'outEnd', valAxisLabelFontSize: 11, catAxisLabelFontSize: 10, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showLegend: false, showTitle: true, title: 'Projected investor IRR (%)', titleFontSize: 13, titleColor: INK });
   const sp = D.sens; const row = (lab, o) => [lab, fmt(o.npv, 0), fmt(-o.peak, 0)];
   tbl(s, [['Project case', 'NPV (EGP m)', 'Peak shortage (EGP m)'], row('Base', sp.price['1.0']), row('Prices -10%', sp.price['0.9']), row('Prices +10%', sp.price['1.1']), row('Sales delay 12 months', sp.delay['4']), row('Cost overrun +10%', sp.cost['1.1']), row('Collections slip 2 quarters', sp.slip['2']), ['Delivery payments at handover', fmt(D.proj['Delivery payments at handover'].npv, 0), fmt(-D.proj['Delivery payments at handover'].peak, 0)]], 6.8, 1.5, 5.9, [3.0, 1.35, 1.55], 12, { rowH: 0.42 });
-  bullets(s, [`Option A break-even: the units could be resold at ${pct(D.breakeven.A_price_factor_moic1, 0)} of the final list price before the ticket is lost.`, `Option B: cash available covers each instalment at least ${mx(S1.Base.liq_min, 1)} on a pooled-cash basis; net cash flow alone covers it in ${S1.Base.n - S1.Base.strict_below} of ${S1.Base.n} quarters because of the construction peak.`, 'Returns are projections, not guarantees.'], 0.6, 5.1, 12.1, 1.5, 12);
+  bullets(s, [`Option A break-even: the units could be resold at ${pct(D.breakeven.A_price_factor_moic1, 0)} of the delivery list price before the ticket is lost.`, `Option B: cash available covers each instalment at least ${mx(S1.Base.liq_min, 1)} on a pooled-cash basis; net cash flow alone covers it in ${S1.Base.n - S1.Base.strict_below} of ${S1.Base.n} quarters because of the construction peak.`, 'Returns are projections, not guarantees.'], 0.6, 5.1, 12.1, 1.5, 12);
   source(s, 'Financial Annex, Scenarios, Sensitivity and Option sheets. Project cases show Jalour net cash flow before any investor instrument.', 6.65); }
 // 15 Risks
 { const s = content('Risks and mitigants');
   tbl(s, [['Risk', 'Mitigant'],
     ['Market and price: sales plan assumes list-price rises of ' + fmt(Math.min(D.prices.final[1] / D.prices.launch[1], D.prices.final[0] / D.prices.launch[0]) * 100 - 100, 0) + '% to ' + fmt(Math.max(D.prices.final[1] / D.prices.launch[1], D.prices.final[0] / D.prices.launch[0]) * 100 - 100, 0) + '% over the sales window', 'Downside case shown; Option B has no unit price exposure; price evidence in the data room'],
-    ['Delivery payments collected ahead of handover', 'Contractual milestone; Jalour funds any gap; stress case shown'],
+    ['Delivery payments collected ahead of handover', 'Contractual milestone; Jalour covers any gap from cash reserves and other projects\' cash; stress case shown'],
     ['Construction cost and inflation (costs flat in the model)', 'Cost +10% case; fixed-price contracting to be sought; contingency 5% in the model'],
     ['Landlord: consent and minimum guarantee payments', 'Written consent as a condition precedent; guarantee schedule fully funded in the plan'],
     ['Delivery and permits', 'Permit status in the data room; independent engineer (optional)'],

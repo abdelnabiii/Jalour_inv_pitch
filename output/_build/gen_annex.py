@@ -68,11 +68,11 @@ def make_annex(k, T, path):
     sec('Launch price list and tranche values (source model sales sheet)')
     inp('pl_c', 'Launch list price, retail', Lh['p0'][0], 'EGP k / m2', 'First sales column, row 3', '#,##0')
     inp('pl_a', 'Launch list price, offices', Lh['p0'][1], 'EGP k / m2', 'First sales column, row 4', '#,##0')
-    inp('pf_c', 'Final list price, retail', Lh['fin'][0], 'EGP k / m2', 'Last sales column, row 3', '#,##0')
-    inp('pf_a', 'Final list price, offices', Lh['fin'][1], 'EGP k / m2', 'Last sales column, row 4', '#,##0')
+    inp('pf_c', 'Delivery list price, retail (last list price in the plan)', Lh['fin'][0], 'EGP k / m2', 'Last sales column, row 3', '#,##0')
+    inp('pf_a', 'Delivery list price, offices (last list price in the plan)', Lh['fin'][1], 'EGP k / m2', 'Last sales column, row 4', '#,##0')
     inp('Vc', 'Launch tranches: retail sales value at list', Lh['Vc'], 'EGP m', f"First two sales tranches (months {Lh['months'][0]} and {Lh['months'][1]}), row 24", N1)
     inp('Va', 'Launch tranches: office sales value at list', Lh['Va'], 'EGP m', 'Same tranches, row 25', N1)
-    inp('appr', 'Price appreciation launch to final list (value-weighted)', f"=({ref['Vc'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_c'].split('!')[1]}/{ref['pl_c'].split('!')[1]})+({ref['Va'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_a'].split('!')[1]}/{ref['pl_a'].split('!')[1]})", 'x', 'Calculated. Investor resale value = face x this factor (base)', '0.0000', True)
+    inp('appr', 'Price appreciation launch to delivery list (value-weighted)', f"=({ref['Vc'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_c'].split('!')[1]}/{ref['pl_c'].split('!')[1]})+({ref['Va'].split('!')[1]}/({ref['Vc'].split('!')[1]}+{ref['Va'].split('!')[1]}))*({ref['pf_a'].split('!')[1]}/{ref['pl_a'].split('!')[1]})", 'x', 'Calculated. Investor resale value = face x this factor (base)', '0.0000', True)
     sec('Option B alternatives (considered, not recommended)')
     pc = calibrate_min_pct(k, T, M_B2, b, 1.5*M_B2*T/12, 0.4*M_B2*T/12); ph = calibrate_hybrid(k, T, 1.8, M_B2, 2.8, b)
     inp('s2_pct', 'S2: share of collections', pc, '%', 'Calibrated (Python) so the base case reaches the target multiple by the end of the payout window', '0.0000%')
@@ -242,7 +242,7 @@ def make_annex(k, T, path):
     al = [('face', 'Face value of units at launch list', f"={R('face_x')}*{R('T')}", N1, 'EGP m'), ('share', 'Share of launch-tranche inventory allocated', f"=B5/{R('Vl')}", PC, ''),
           ('face_c', 'of which retail', f"=B5*{R('Vc')}/{R('Vl')}", N1, 'EGP m'), ('face_a', 'of which offices', f"=B5*{R('Va')}/{R('Vl')}", N1, 'EGP m'),
           ('area_c', 'Retail area allocated', f"=B7*1000/{R('pl_c')}", '#,##0', 'm2'), ('area_a', 'Office area allocated', f"=B8*1000/{R('pl_a')}", '#,##0', 'm2'),
-          ('val', 'Value at final list price (before resale friction)', f"=B5*{R('appr')}", N1, 'EGP m'), ('ll', 'Landlord 35% on the allocated units, borne by Jalour', f"={R('ll')}*B5", N1, 'EGP m')]
+          ('val', 'Value at delivery list price (before resale friction)', f"=B5*{R('appr')}", N1, 'EGP m'), ('ll', 'Landlord 35% on the allocated units, borne by Jalour', f"={R('ll')}*B5", N1, 'EGP m')]
     AR_ = {}
     for j, (key, lab, f_, fm, un) in enumerate(al):
         rr = 5+j; AR_[key] = rr; wsA.cell(rr, 1, lab).font = F_N; c = wsA.cell(rr, 2, f_); c.number_format = fm; c.font = F_N; wsA.cell(rr, 3, un)
@@ -265,7 +265,7 @@ def make_annex(k, T, path):
     for key in ('inv', 'jal_t', 'jal_c', 'jal_s', 'jal'): wsA.cell(ar[key], 2, f'=SUM({FIRST}{ar[key]}:{LAST}{ar[key]})').number_format = N2
     hdr(wsA, 25, ['Returns', 'Value', 'Note'])
     inv_r = f'{FIRST}{ar["inv"]}:{LAST}{ar["inv"]}'; jal_r = f'{FIRST}{ar["jal"]}:{LAST}{ar["jal"]}'
-    ret = [('irr', 'Investor IRR, base', f'=(1+IRR({inv_r},0.05))^4-1', PC, 'Appreciation to final list price in the model'), ('moic', 'Investor MOIC, base', f'=SUMIF({inv_r},">0")/-SUMIF({inv_r},"<0")', X, ''),
+    ret = [('irr', 'Investor IRR, base', f'=(1+IRR({inv_r},0.05))^4-1', PC, 'Appreciation to delivery list price in the model'), ('moic', 'Investor MOIC, base', f'=SUMIF({inv_r},">0")/-SUMIF({inv_r},"<0")', X, ''),
            ('payback', 'Investor payback month', f'=INDEX({FIRST}{ar["month"]}:{LAST}{ar["month"]},MATCH(1,{FIRST}27:{LAST}27,0))', '0', 'First quarter cumulative cash is not negative'),
            ('jirr', 'Jalour cost of capital (IRR of ticket vs forgone collections)', f'=(1+IRR({jal_r},0.05))^4-1', PC, 'Jalour bears landlord share'), ('jnpv', 'NPV to Jalour @ discount rate', f'=SUMPRODUCT({jal_r},{PR("df")})', N1, ''),
            ('jnom', 'Nominal net cost to Jalour', f'=B{ar["jal"]}', N1, ''), ('proj_npv', 'Project NPV after the deal', f"={PK['npv']}+B30", N1, 'Project NPV before the deal plus deal NPV'),

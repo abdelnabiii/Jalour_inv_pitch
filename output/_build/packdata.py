@@ -104,6 +104,9 @@ def build(k, T):
     D['tranches'] = [dict(month=t['month'], comm=t['sales_comm']/1000, admin=t['sales_admin']/1000, pc=t['price_comm'], pa=t['price_admin']) for t in TR[k]['tranches']]
     ach = TR[k]['tranches']; area_c = sum(t['area_comm'] for t in ach); area_a = sum(t['area_admin'] for t in ach)
     D['prices'] = dict(launch=Lh['p0'], final=Lh['fin'], avg=(sum(t['sales_comm'] for t in ach)/area_c, sum(t['sales_admin'] for t in ach)/area_a), sold_area=(area_c, area_a))
+    yrs = (I['delivery']+2)/12; mid = 113.0       # ASSUMPTION: model month 1 = December 2026; office asking mid-point EGP 113,000 per m2 (106,000 to 120,000)
+    pl_c_, pl_a_ = Lh['p0']; pf_c_, pf_a_ = Lh['fin']; ap_c_, ap_a_ = D['prices']['avg']
+    D['pricecmp'] = dict(years=yrs, ask_mid_off=mid, off_vs_ask=pf_a_/mid-1, off_cagr=(pf_a_/mid)**(1/yrs)-1, launch_off_vs_ask=pl_a_/mid-1, retail_g=pf_c_/pl_c_-1, office_g=pf_a_/pl_a_-1, retail_avg_g=ap_c_/pl_c_-1, office_avg_g=ap_a_/pl_a_-1, blended=A['appr']-1)
     return D
 if __name__ == '__main__':
     D = build('GS', 100)

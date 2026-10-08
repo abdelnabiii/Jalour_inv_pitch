@@ -37,9 +37,9 @@ Delivery payments at handover: GS 269, LA 244. Sales +12 months and prices -10%:
 ## No guarantee: recommendation (decision 5)
 Do not guarantee the return. Offer instead: payment priority covenant (no shareholder distributions while an instalment is overdue), earmark of unsold launch-tranche or later units worth at least the ticket with substitution, negative pledge, monthly reporting and audit rights, and a sponsor funding undertaking limited to project funding gaps and completion. Optional: promissory notes, independent engineer, step-in right.
 
-## Items needing you
-1. Sponsor funding undertaking: amount, form and wording (a statement that Jalour covers gaps is a commitment; the downside gap is GS 441 / LA 849).
-2. "Nothing ring-fenced" versus Decree 2184/2022 (separate project account reported for developers on state-linked land): counsel to confirm. I kept each project in its own company with no cross-collateral, and no restricted accounts.
-3. Landlord consent for launch-price unit allocation (no waiver requested).
-4. L'avenir price rises 44% to 50% from first sale and GS 33% to 48%: GS sits below your 40% to 60% on retail.
-5. Market data are from search summaries; verify before issue.
+## Items resolved or changed after your answers
+1. Funding gaps: to be covered from Jalour's cash reserves and cash from other projects it is constructing. The packs say so, and say plainly that this capacity is not ring-fenced and depends on those projects (GS downside gap 441, LA 849). Form and any cap still to be documented.
+2. Separate project account: treated as not applicable to these plots (Jalour's position); basis goes in the data room.
+3. Prices compared with delivery prices: Option A and the price pages now use the delivery list (last list price in the plan, unchanged to handover). GS offices +48% and retail +33% from launch; LA +50% and +44%. Against today's office asking prices the delivery list is +77% (GS, about 15% a year) and +112% (LA, about 18% a year).
+4. Market fact base: sent to you for review before verification.
+5. Sponsor, permit, title and landlord-consent documents: marked as provided after the investor signs an NDA.

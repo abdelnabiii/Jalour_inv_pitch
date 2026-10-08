@@ -62,7 +62,7 @@ Python engine vs spreadsheet reconciliation sheet: ALL CHECKS ZERO
 | DD_Memo.docx | 18 | 0   | 2 word/document.xml: ...00                   191,250                   106,00... | word/document.xml: ...etail                    250,000                    3... |
 | Deck.pptx | 98 | 0   | 3 ppt/slides/slide5.xml: ...Launch EGP 250,000 per m2, rising to 36... | ppt/slides/slide9.xml: ...250... | ppt/charts/chart3.xml: ...General          250.488    250.488    187.86... |
 | Financial_Annex.xlsx | 21 | 0   | 3 xl/worksheets/sheet3.xml: ...127      128      129    250    130    131      132... | xl/worksheets/sheet10.xml: ...7.2980896875    Y54+Z53  250.0021783125    Z54+AA53... | xl/worksheets/sheet7.xml: ....703703703704    88      250    B7*1000/Inputs!$B$28... |
-| Investment_Memo.docx | 18 | 0   | 9 word/document.xml: ...launch list (retail EGP 250,000 per m2, offices EGP... | word/document.xml: ...t prices rising from EGP 250,000 to 360,000 per m2 fo... | word/document.xml: ...at a launch list of EGP 250,000 (retail) and 160,000... |
+| Investment_Memo.docx | 18 | 0   | 11 word/document.xml: ...launch list (retail EGP 250,000 per m2, offices EGP... | word/document.xml: ...t prices rising from EGP 250,000 to 360,000 per m2 fo... | word/document.xml: ...at a launch list of EGP 250,000 (retail) and 160,000... |
 
 Prohibited-term hits: 0. Bare "250" occurrences are listed for context only: they are prices or the units face value, not a programme total.
 
