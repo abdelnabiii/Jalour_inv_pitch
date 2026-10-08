@@ -92,7 +92,7 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
     ['Developer sales', 'Top 10 developers EGP 670 bn in H1 2026, +2.9% y/y; units sold -5%', 'Sales over about 3 years from launch'],
     ['Payment plans', 'Typically 8 to 12 years with 1.5% to 10% down payment', 'Down payments 5% to 20%; instalments 2 to 8 years']],
     0.6, 1.5, 12.1, [1.9, 5.6, 4.6], 12, { left: true, boldFirst: true, rowH: 0.6 });
-  s.addText('Reading across: the sales plan needs price growth that sits at the upper end of recent evidence. The downside case on slide 14 tests lower prices and later sales.', { x: 0.6, y: 5.65, w: 12.1, h: 0.7, fontSize: 13, color: INK, margin: 0, isTextBox: true });
+  s.addText(`Reading across: the sales plan needs price growth that sits at the upper end of recent evidence. The downside case on slide ${D.combined ? 15 : 14} tests lower prices and later sales.`, { x: 0.6, y: 5.65, w: 12.1, h: 0.7, fontSize: 13, color: INK, margin: 0, isTextBox: true });
   source(s, 'Property Finder listings (2026); JLL via Enterprise (2026); Sands of Wealth (2026); CBE via Bnok24; CAPMAS via Ahram Online; Daily News Egypt; Bayut. Listings are asking prices, not transactions.', 6.55); }
 // 6 The project
 { const s = content('The project');
@@ -132,6 +132,17 @@ const bal = 'The balance of project funding is provided by Jalour sponsor equity
   stat(s, 9.1, 3.2, 3.6, fmt(D.base.npv, 0), 'NPV at 14%, EGP million');
   stat(s, 9.1, 4.9, 3.6, fmt(F.model_peak, 1), `Peak cumulative shortage, EGP million (month ${D.base.peak_m})`);
   source(s, 'Jalour financial model; Financial Annex, Project_CF sheet. Project years: Y1 = months 1 to 12. Excludes the 20% of units retained by Jalour.', 6.6); }
+// 10b Combined cash position (125M packs only)
+if (D.combined) { const C = D.combined, O = C.other; const s = content(`Combined cash position: ${NAME} and ${O.name}`);
+  const n = 28; const lab = C.months.slice(0, n).map(m => 'M' + m);
+  s.addChart(pres.charts.LINE, [{ name: NAME, labels: lab, values: C.self_cum.slice(0, n) }, { name: O.name, labels: lab, values: C.other_cum.slice(0, n) }, { name: 'Combined', labels: lab, values: C.comb_cum.slice(0, n) }], { x: 0.6, y: 1.35, w: 6.4, h: 3.9, chartColors: [NAVY, BRASS, RED], lineSize: 2.5, lineDataSymbol: 'none', showLegend: true, legendPos: 'b', legendFontSize: 11, valAxisLabelFontSize: 10, catAxisLabelFontSize: 9, catAxisLabelFrequency: 3, valGridLine: { color: MID, size: 0.5 }, catGridLine: { style: 'none' }, showTitle: true, title: 'Cumulative net cash flow before investor instruments (EGP million)', titleFontSize: 12, titleColor: INK });
+  const ob = C.other_base;
+  tbl(s, [['EGP million', NAME, O.name], ['Handover (month)', String(I.delivery), String(O.delivery)], ['Sales plan, 80% of units', fmt(I.total80, 0), fmt(O.total80, 0)], ['Net cash flow', fmt(D.base.net, 0), fmt(ob.net, 0)], ['NPV at 14%', fmt(D.base.npv, 0), fmt(ob.npv, 0)], ['Peak shortage (month)', fmt(-D.base.peak, 1) + ' (' + D.base.peak_m + ')', fmt(-ob.peak, 1) + ' (' + ob.peak_m + ')']], 7.3, 1.4, 5.4, [2.4, 1.5, 1.5], 11, { rowH: 0.32 });
+  const sc = C.scen; const nm = ['Base case', 'Delivery payments at handover', 'Collections slip 2 quarters', 'Downside: sales +12 months, prices -10%'];
+  const labs = ['Base', 'Delivery payments at handover', 'Collections slip 2 quarters', 'Sales +12 months, prices -10%'];
+  tbl(s, [['Peak shortage (EGP m)', NAME.split(' ')[0], O.name.split(' ')[0], 'Combined']].concat(nm.map((k, i) => [labs[i], fmt(-sc[k].self_peak, 0), fmt(-sc[k].other_peak, 0), fmt(-sc[k].comb_peak, 0)])), 7.3, 3.55, 5.4, [2.4, 1.0, 1.0, 1.0], 11, { rowH: 0.32 });
+  bullets(s, [`Base case: the combined position is lowest at EGP ${fmt(-C.comb_min, 1)} million in month ${C.comb_min_m} and turns positive in month ${C.comb_pos_month}.`, 'In the stress cases both projects are short at the same time, so one project\'s cash cannot be assumed to fund the other.', 'Shown: these two projects only, before any investor instrument. Jalour\'s cash reserves and other projects are not included. No cross-collateral or cross-default between the projects.'], 0.6, 5.5, 12.1, 1.1, 12);
+  source(s, 'Jalour financial model; Financial Annex, Combined_Position sheet. Projections, not guarantees.', 6.65); }
 // 11 Sources and uses
 { const s = content('Sources and uses of funds');
   const u = F.uses;

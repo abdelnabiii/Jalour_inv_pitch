@@ -25,6 +25,11 @@
 | Option B quarters below 1.5x (net cash flow) | Summary!B40 | 9.0000 | 9 | Memo: yes, DD: yes | OK |
 | Option B IRR if S2 | Summary!B45 | 0.2903 | 29%/29.0% | Memo: yes, DD: yes | OK |
 | Option B IRR if S3 | Summary!B46 | 0.2784 | 27.8%/28% | Memo: yes, DD: yes | OK |
+| Combined lowest cumulative position | Summary!B48 | 167.9546 | 168/168.0 | Deck: yes, Memo: yes | OK |
+| Combined downside peak shortage | Summary!B51 | 1088.9735 | 1,089/1,089.0 | Deck: yes, Memo: yes, DD: yes | OK |
+| Combined peak, delivery payments at handover | Summary!B52 | 318.3333 | 318/318.3 | Deck: yes, Memo: yes | OK |
+| Other project NPV | Summary!B54 | 307.5324 | 307.5/308 | Deck: yes, Memo: yes | OK |
+| Other project net cash flow | Summary!B53 | 595.2929 | 595/595.3 | Deck: yes, Memo: yes | OK |
 | Stress peak shortage | python | 269.1979 | 269/269.2 | Deck: yes, Memo: yes, DD: yes | OK |
 | Downside peak shortage | python | 441.1946 | 441/441.2 | Memo: yes, DD: yes | OK |
 | Ticket | python | 125.0000 | 125/125.0 | Deck: yes, Memo: yes, DD: yes | OK |
@@ -60,8 +65,8 @@ Python engine vs spreadsheet reconciliation sheet: ALL CHECKS ZERO
 | File | Parts scanned | Prohibited hits | Bare "250" contexts |
 |---|---|---|---|
 | DD_Memo.docx | 18 | 0   | 0  |
-| Deck.pptx | 98 | 0  Allowed in context: 250 million x1 in ppt/slides/slide2.xml (units face value 2.0 x 125); 250 million x1 in ppt/slides/slide3.xml (units face value 2.0 x 125); 250 million x1 in ppt/slides/slide12.xml (units face value 2.0 x 125) | 3 ppt/slides/slide2.xml: ...with a face value of EGP 250 million (2.0x the ticket... | ppt/slides/slide3.xml: ...with a face value of EGP 250 million at launch list p... | ppt/slides/slide12.xml: ...with a face value of EGP 250 million (2.0x) at launch... |
-| Financial_Annex.xlsx | 21 | 0   | 5 xl/worksheets/sheet2.xml: ...32    Option_A!B5  250    B20/Inputs!$B$52  5.2... | xl/worksheets/sheet10.xml: ...44406875    AE378+AF377  250.175367773437    AF378+AG... | xl/worksheets/sheet7.xml: ...Inputs!$B$8*Inputs!$B$7  250    88      247    B5/Inp... |
+| Deck.pptx | 104 | 0  Allowed in context: 250 million x1 in ppt/slides/slide2.xml (units face value 2.0 x 125); 250 million x1 in ppt/slides/slide3.xml (units face value 2.0 x 125); 250 million x1 in ppt/slides/slide13.xml (units face value 2.0 x 125) | 3 ppt/slides/slide2.xml: ...with a face value of EGP 250 million (2.0x the ticket... | ppt/slides/slide3.xml: ...with a face value of EGP 250 million at launch list p... | ppt/slides/slide13.xml: ...with a face value of EGP 250 million (2.0x) at launch... |
+| Financial_Annex.xlsx | 22 | 0   | 5 xl/worksheets/sheet2.xml: ...32    Option_A!B5  250    B20/Inputs!$B$52  5.2... | xl/worksheets/sheet6.xml: ...1.21951219512195       250    MIN(B12,B8)/B8  1... | xl/worksheets/sheet10.xml: ...44406875    AE378+AF377  250.175367773437    AF378+AG... |
 | Investment_Memo.docx | 18 | 0  Allowed in context: 250 million x3 in word/document.xml (units face value 2.0 x 125) | 6 word/document.xml: ...with a face value of EGP 250 million, twice the ticke... | word/document.xml: ...value                    250                       Op... | word/document.xml: ...162.1                   250                   160... |
 
 Prohibited-term hits: 0. Bare "250" occurrences are listed for context only: they are prices or the units face value, not a programme total.

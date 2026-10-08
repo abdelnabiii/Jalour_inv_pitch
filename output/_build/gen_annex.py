@@ -172,7 +172,9 @@ def make_annex(k, T, path):
     wsU.cell(20, 1, 'Funding-gap exposure (sponsor covers gaps in excess of project cash)').font = F_B
     wsU.column_dimensions['A'].width = 80; wsU.column_dimensions['B'].width = 16; wsU.column_dimensions['C'].width = 110
     # ============ scenario block writer ============
+    BLK = {}
     def block(ws, r0, title, price=1.0, delay=0, cost=1.0, slip=0, deliv=0):
+        BLK[(ws.title, title)] = r0
         ws.cell(r0, 1, title).font = F_B; ws.cell(r0, 1).fill = FILL_K
         names = ['Price factor', 'Sales delay (quarters)', 'Cost factor', 'Collections slip (quarters)', 'Delivery payments at handover (1 = yes)']
         pcells = []
@@ -362,6 +364,54 @@ def make_annex(k, T, path):
         wsB[f'{col}47'].number_format = N2; wsB[f'{col}47'].font = F_N; wsB[f'{col}48'].font = F_N
     wsB['B46'] = f'=INDEX({FIRST}5:{LAST}5,MATCH(1,{FIRST}48:{LAST}48,0))'; wsB['B46'].number_format = '0'
     wsB.freeze_panes = 'B6'
+
+    COMB = None
+    if T == 125:
+        py0 = PD.build(k, T); C0 = py0['combined']; ok = C0['other_k']; oname = C0['other']['name']
+        wsK = sh('Combined_Position', f'{name} and {oname}: combined cash position (EGP million)', 'Both projects before any investor instrument. Other-project series are blue inputs taken from the source model; everything else is a formula.')
+        wsK.column_dimensions['A'].width = 62; wsK.column_dimensions['B'].width = 18; wsK.column_dimensions['C'].width = 14
+        for i in range(1, NQ_+1): wsK.column_dimensions[qc(i)].width = 9
+        hdr(wsK, 4, ['Series', 'Source / value', 'Total'] + [''] * NQ_)
+        wsK.cell(5, 1, 'Month').font = F_B
+        for i in range(1, NQ_+1): wsK[f'{qc(i)}5'] = f'=Source_Data!{qc(i)}${S["month"]}'; wsK[f'{qc(i)}5'].font = F_N
+        othrow = {'GS': 40, 'LA': 41}[ok]
+        lab_ = {6: f'{name} cumulative net cash flow (base)', 7: f'{oname} net cash flow (base)', 8: f'{oname} cumulative net cash flow (base)', 9: 'Combined cumulative net cash flow (base)', 10: 'Combined positive after the low (1/0)'}
+        for r_, t_ in lab_.items(): wsK.cell(r_, 1, t_).font = F_B if r_ == 9 else F_N
+        wsK.cell(7, 2, f"Source model, 'Net Cash Flow -With DP' row {othrow}").font = F_NOTE
+        for i in range(1, NQ_+1):
+            col = qc(i)
+            wsK[f'{col}6'] = f'=Project_CF!{col}{P_["cum"]}'; wsK[f'{col}7'] = float(C0['other_net_series'][i-1]); wsK[f'{col}7'].font = F_IN
+            wsK[f'{col}8'] = f'={col}7' if i == 1 else f'={qc(i-1)}8+{col}7'; wsK[f'{col}9'] = f'={col}6+{col}8'; wsK[f'{col}10'] = f'=IF(AND({col}9>0,{col}5>$B$12),1,0)'
+            for r_ in (6, 7, 8, 9): wsK[f'{col}{r_}'].number_format = N2
+            for r_ in (6, 8, 9, 10): wsK[f'{col}{r_}'].font = F_N
+        wsK.cell(7, 3, f'=SUM({FIRST}7:{LAST}7)').number_format = N2
+        for r_, (t_, f_, fm) in {11: ('Lowest combined cumulative position', f'=MIN({FIRST}9:{LAST}9)', N1), 12: ('Month of the lowest combined position', f'=INDEX({FIRST}5:{LAST}5,MATCH(B11,{FIRST}9:{LAST}9,0))', '0'), 13: ('First month combined position is positive after the low', f'=INDEX({FIRST}5:{LAST}5,MATCH(1,{FIRST}10:{LAST}10,0))', '0')}.items():
+            wsK.cell(r_, 1, t_).font = F_B; c = wsK.cell(r_, 2, f_); c.number_format = fm; c.font = F_B; c.fill = FILL_K
+        wsK.cell(15, 1, f'{oname}: facts and totals').font = F_B
+        ob0 = C0['other_base']; Io0 = C0['other']
+        facts_ = [(16, 'Handover (project month)', Io0['delivery'], '0', 'Source model', True), (17, 'Landlord minimum guarantee', Io0['guarantee'], N1, 'Source model, Offers DP', True), (18, 'Sales plan, 80% of units', Io0['total80'], N1, 'Source model', True), (19, 'Collections', ob0['coll'], N1, "Source model, 'Net Cash Flow -With DP'", True), (20, 'Landlord payments', ob0['land'], N1, "Source model, 'Net Cash Flow -With DP'", True), (21, 'Construction, commission and SG&A', ob0['cost'], N1, "Source model, 'Net Cash Flow -With DP'", True),
+                  (22, 'Net cash flow, nominal', f'=C7', N1, 'Calculated', False), (23, 'NPV at discount rate', f'=SUMPRODUCT({FIRST}7:{LAST}7,{PR("df")})', N1, 'Calculated, same discount factors', False), (24, 'Peak cumulative shortage', f'=MIN({FIRST}8:{LAST}8)', N1, 'Calculated', False)]
+        for r_, t_, v_, fm, sr, inp_ in facts_:
+            wsK.cell(r_, 1, t_).font = F_N; c = wsK.cell(r_, 2, v_); c.number_format = fm; c.font = F_IN if inp_ else F_B; wsK.cell(r_, 3, sr).font = F_NOTE
+        KS = {}
+        row0 = 28
+        for nm_ in PD.scen_defs():
+            r0 = BLK[('Scenarios', nm_)]; wsK.cell(row0, 1, nm_).font = F_B; wsK.cell(row0, 1).fill = FILL_K
+            labs_ = ['own cumulative net cash flow', 'other net cash flow', 'other cumulative', 'combined cumulative']
+            for j_, l_ in enumerate(labs_): wsK.cell(row0+1+j_, 1, (name if j_ == 0 else oname if j_ in (1, 2) else 'Combined') + ' ' + l_ if j_ < 3 else 'Combined cumulative').font = F_N
+            wsK.cell(row0+2, 2, 'Same scenario run on the source model cash flows').font = F_NOTE
+            for i in range(1, NQ_+1):
+                col = qc(i)
+                wsK[f'{col}{row0+1}'] = f"=Scenarios!{col}{r0+14}"; wsK[f'{col}{row0+2}'] = float(C0['other_scen_series'][nm_][i-1]); wsK[f'{col}{row0+2}'].font = F_IN
+                wsK[f'{col}{row0+3}'] = f'={col}{row0+2}' if i == 1 else f'={qc(i-1)}{row0+3}+{col}{row0+2}'; wsK[f'{col}{row0+4}'] = f'={col}{row0+1}+{col}{row0+3}'
+                for j_ in (1, 2, 3, 4): wsK[f'{col}{row0+j_}'].number_format = N2
+                for j_ in (1, 3, 4): wsK[f'{col}{row0+j_}'].font = F_N
+            outs_ = [('Own peak shortage', f'=-MIN({FIRST}{row0+1}:{LAST}{row0+1})'), ('Other project peak shortage', f'=-MIN({FIRST}{row0+3}:{LAST}{row0+3})'), ('Combined peak shortage', f'=-MIN({FIRST}{row0+4}:{LAST}{row0+4})'), ('Month of combined peak', f'=INDEX({FIRST}$5:{LAST}$5,MATCH(MIN({FIRST}{row0+4}:{LAST}{row0+4}),{FIRST}{row0+4}:{LAST}{row0+4},0))')]
+            for j_, (t_, f_) in enumerate(outs_):
+                wsK.cell(row0+5+j_, 1, t_).font = F_B; c = wsK.cell(row0+5+j_, 2, f_); c.number_format = N1 if j_ < 3 else '0'; c.font = F_B; c.fill = FILL_K
+            KS[nm_] = row0+7; row0 += 11
+        wsK.freeze_panes = 'D6'
+        COMB = dict(KS=KS, py=py0)
     # ============ Summary ============
     wsM = sh('Summary', f'{name}: key outputs, ticket EGP {T}m (all cells are live links)', f'USD equivalents at {48} EGP per USD.')
     wsM.column_dimensions['A'].width = 78; wsM.column_dimensions['B'].width = 18; wsM.column_dimensions['C'].width = 18; wsM.column_dimensions['D'].width = 50
@@ -396,6 +446,11 @@ def make_annex(k, T, path):
     srow('b_cov1', 'Lowest quarterly coverage (net cash flow / payout)', "=Option_B!B37", '0.00', False, 'Option_B'); srow('b_cov1n', 'Quarters below 1.5x (net cash flow basis)', "=Option_B!B38", '0', False, 'Option_B'); srow('b_n', 'Payout quarters', "=Option_B!B39", '0', False, 'Option_B')
     srow('b_cov2', 'Lowest coverage (cash available / payout)', "=Option_B!B40", '0.00', False, 'Option_B'); srow('b_cov2n', 'Quarters below 1.5x (cash available basis)', "=Option_B!B41", '0', False, 'Option_B'); srow('b_cash', 'Lowest pooled cash after ticket and payouts (EGP m)', "=Option_B!B42", N1, False, 'Option_B')
     srow('b_dirr', 'Investor IRR if S2 (alternative)', "=Option_B!C34", PC, False, 'Option_B'); srow('b3_irr', 'Investor IRR if S3 (alternative)', "=Option_B!D34", PC, False, 'Option_B')
+    if COMB:
+        sub('Combined view with the other Jalour project (125M packs only)')
+        srow('comb_min', 'Combined lowest cumulative position, shown as a shortage (EGP m)', "=-Combined_Position!B11", N1, False, 'Combined_Position'); srow('comb_min_m', 'Month of the combined low', "=Combined_Position!B12", '0', False, 'Combined_Position'); srow('comb_pos', 'First month the combined position is positive after the low', "=Combined_Position!B13", '0', False, 'Combined_Position')
+        srow('comb_dn', 'Combined peak shortage, downside (EGP m)', f"=Combined_Position!B{COMB['KS']['Downside: sales +12 months, prices -10%']}", N1, False, 'Combined_Position'); srow('comb_ho', 'Combined peak shortage, delivery payments at handover (EGP m)', f"=Combined_Position!B{COMB['KS']['Delivery payments at handover']}", N1, False, 'Combined_Position')
+        srow('oth_net', 'Other project net cash flow, nominal (EGP m)', "=Combined_Position!B22", N1, False, 'Combined_Position'); srow('oth_npv', 'Other project NPV at 14% (EGP m)', "=Combined_Position!B23", N1, False, 'Combined_Position'); srow('oth_peak', 'Other project peak shortage (EGP m)', "=-Combined_Position!B24", N1, False, 'Combined_Position')
     sub('Scenario results: peak cumulative shortage / NPV / Option B lowest pooled cash (EGP m)')
     for nm in PD.scen_defs():
         O = SCN[nm]
@@ -421,6 +476,10 @@ def make_annex(k, T, path):
                ('Python recomputation: Option B S1 investor IRR', "=Option_B!B34", py['B']['S']['S1']['res']['Base']['irr'], 'Independent Python'), ('Python recomputation: Option B S2 investor IRR', "=Option_B!C34", py['B']['S']['S2']['res']['Base']['irr'], 'Independent Python'),
                ('Python recomputation: Option B S3 investor IRR', "=Option_B!D34", py['B']['S']['S3']['res']['Base']['irr'], 'Independent Python'), ('Python recomputation: downside peak shortage', f"=-{SCN['Downside: sales +12 months, prices -10%']['peak']}", py['fund']['downside_peak'], 'Independent Python'),
                ('Python recomputation: Option B S1 lowest pooled cash', "=Option_B!B42", py['B']['S']['S1']['res']['Base']['min_cash'], 'Independent Python')]
+    if COMB:
+        om = PD.MODEL_REF[COMB['py']['combined']['other_k']]
+        checks += [('Combined: other project net cash flow vs source model', '=Combined_Position!B22', om['net'], 'Source model'), ('Combined: other project NPV vs source model', '=Combined_Position!B23', om['npv'], 'Source model'), ('Combined: other project peak shortage vs source model', '=Combined_Position!B24', om['peak'], 'Source model'),
+                   ('Python recomputation: combined lowest position', '=Combined_Position!B11', COMB['py']['combined']['comb_min'], 'Independent Python'), ('Python recomputation: combined downside peak shortage', f"=Combined_Position!B{COMB['KS']['Downside: sales +12 months, prices -10%']}", -COMB['py']['combined']['scen']['Downside: sales +12 months, prices -10%']['comb_peak'], 'Independent Python')]
     for j, (lab, a_, b_, bs) in enumerate(checks):
         rr = 5+j; wsR.cell(rr, 1, lab).font = F_N; c = wsR.cell(rr, 2, a_); c.number_format = '#,##0.000000'; c.font = F_N
         c2 = wsR.cell(rr, 3, b_); c2.number_format = '#,##0.000000'; c2.font = F_IN if not (isinstance(b_, str) and b_.startswith('=')) else F_N
@@ -436,14 +495,14 @@ def make_annex(k, T, path):
     notes = ['Purpose: supports the Investment Memorandum, Pitch Deck and Due Diligence Memorandum. Every figure in those documents traces to the Summary sheet.',
              'Colour code: blue = input or value transcribed from the source model; black = formula; green = link to another sheet.',
              'Units: EGP million unless stated. Quarter-end months. NPV at 14% p.a. (end-of-quarter discounting). IRRs are annualised from quarterly flows.',
-             'Sheets: Inputs, Source_Data, Project_CF, Sources_Uses, Option_A, Option_B, Scenarios, Sensitivity, Summary, Reconciliation.',
+             'Sheets: Inputs, Source_Data, Project_CF, Sources_Uses, Option_A, Option_B, Scenarios, Sensitivity, ' + ('Combined_Position, ' if T == 125 else '') + 'Summary, Reconciliation.',
              'The balance of project funding is provided by Jalour sponsor equity, project collections and other capital sources.',
              'Jalour may raise further capital at project or holding level, subject to the investor\'s stated rights.',
              'Reconciliation status:']
     for j, t_ in enumerate(notes): wsV.cell(4+j, 1, t_).font = F_N
     wsV.cell(10, 2, f"=Reconciliation!D{last+3}").font = F_B; wsV.cell(10, 2).fill = FILL_OK
     wsV.column_dimensions['A'].width = 150; wsV.column_dimensions['B'].width = 22
-    order = ['Cover', 'Summary', 'Inputs', 'Source_Data', 'Project_CF', 'Sources_Uses', 'Option_A', 'Option_B', 'Scenarios', 'Sensitivity', 'Reconciliation']
+    order = ['Cover', 'Summary', 'Inputs', 'Source_Data', 'Project_CF', 'Sources_Uses', 'Option_A', 'Option_B', 'Scenarios', 'Sensitivity'] + (['Combined_Position'] if COMB else []) + ['Reconciliation']
     wb._sheets = [wb[n] for n in order]
     wb.save(path)
     return dict(M=M, SCN=SCN, SEN=SEN, last=last)

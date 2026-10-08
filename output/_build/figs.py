@@ -24,4 +24,8 @@ def make(D, outdir):
     ax.barh(ys, [c[1]['npv'] for c in cases], 0.55, color=[NAVY if c[1]['npv'] >= 0 else RED for c in cases])
     for y, c in zip(ys, cases): ax.text(c[1]['npv'] + (6 if c[1]['npv'] >= 0 else -6), y, f"{c[1]['npv']:,.0f}", va='center', ha='left' if c[1]['npv'] >= 0 else 'right', fontsize=8, color='#1B1F2A')
     ax.set_yticks(ys); ax.set_yticklabels([c[0] for c in cases]); ax.set_xlabel('NPV of Jalour net cash flow at 14%, EGP million'); ax.grid(axis='x', color=MID, lw=0.6); ax.grid(axis='y', visible=False); f.tight_layout(); P['sens'] = os.path.join(outdir, 'fig_sens.png'); f.savefig(P['sens']); plt.close(f)
+    if 'combined' in D:
+        C = D['combined']; M2 = np.array(C['months']); n = 28; f, ax = base((7.2, 3.4))
+        ax.plot(M2[:n], np.array(C['self_cum'])[:n], color=NAVY, lw=2, label=D['info']['name']); ax.plot(M2[:n], np.array(C['other_cum'])[:n], color=BRASS, lw=2, label=C['other']['name']); ax.plot(M2[:n], np.array(C['comb_cum'])[:n], color=RED, lw=2.4, label='Combined')
+        ax.axhline(0, color='#9AA3AF', lw=0.8); ax.set_xlabel('Project month'); ax.set_ylabel('Cumulative net cash flow, EGP million'); ax.legend(frameon=False, fontsize=8); f.tight_layout(); P['comb'] = os.path.join(outdir, 'fig_comb.png'); f.savefig(P['comb']); plt.close(f)
     return P

@@ -74,6 +74,7 @@ def run(k, T):
             ('Option A IRR downside', 'a_dirr', 'pct1', 'Deck Memo'), ('Option A MOIC downside', 'a_dmoic', 'x2', 'Deck Memo'), ('Option A IRR upside', 'a_uirr', 'pct1', 'Deck Memo'), ('Jalour cost of capital, Option A', 'j_irr', 'pct1', 'Memo DD'), ('Option A NPV cost to Jalour', 'j_npv', 'm1', 'Memo DD'),
             ('Option B investor IRR', 'b_irr', 'pct1', 'Deck Memo DD'), ('Option B investor MOIC', 'b_moic', 'x2', 'Memo'), ('Option B lowest cash-available coverage', 'b_cov2', 'x1', 'Deck Memo'), ('Option B quarters below 1.5x (net cash flow)', 'b_cov1n', 'int', 'Memo DD'),
             ('Option B IRR if S2', 'b_dirr', 'pct1', 'Memo DD'), ('Option B IRR if S3', 'b3_irr', 'pct1', 'Memo DD')]
+    if T == 125: spec += [('Combined lowest cumulative position', 'comb_min', 'm1', 'Deck Memo'), ('Combined downside peak shortage', 'comb_dn', 'm0', 'Deck Memo DD'), ('Combined peak, delivery payments at handover', 'comb_ho', 'm0', 'Deck Memo'), ('Other project NPV', 'oth_npv', 'm0', 'Deck Memo'), ('Other project net cash flow', 'oth_net', 'm0', 'Deck Memo')]
     rows = []; miss = 0
     for lab, key, kind, docs in spec:
         val = S[key]; v = abs(val) if key in ('peak',) else val
@@ -129,6 +130,7 @@ def run(k, T):
     rep.append(f'\nPython engine vs spreadsheet reconciliation sheet: {S and cell("Reconciliation!$D$" + str(wb["Reconciliation"].max_row))}\n'); fails += bad
     # 3 disclosure scan
     other = ["L'avenir", 'L’avenir', 'Lavenir', "L'AVENIR", 'LA_0', 'LA_1'] if k == 'GS' else ['Green Square', 'GREEN SQUARE', 'GS_0', 'GS_1']
+    if T == 125: other = []   # the 125M packs deliberately show the other project's finances (Jalour decision); all other prohibited terms still apply
     pats = other + ['AT' + ' EAST', 'At' + ' East', 'AT' + ' East', '250M', '250 M', '250 million', '250,000,000', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise']
     rep.append('## 3. Disclosure scan (every file, including document properties, notes, hidden sheets and comments)\n\n| File | Parts scanned | Prohibited hits | Bare "250" contexts |\n|---|---|---|---|')
     hits_total = 0

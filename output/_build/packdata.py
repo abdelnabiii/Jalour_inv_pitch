@@ -107,6 +107,19 @@ def build(k, T):
     yrs = (I['delivery']+2)/12; mid = 113.0       # ASSUMPTION: model month 1 = December 2026; office asking mid-point EGP 113,000 per m2 (106,000 to 120,000)
     pl_c_, pl_a_ = Lh['p0']; pf_c_, pf_a_ = Lh['fin']; ap_c_, ap_a_ = D['prices']['avg']
     D['pricecmp'] = dict(years=yrs, ask_mid_off=mid, off_vs_ask=pf_a_/mid-1, off_cagr=(pf_a_/mid)**(1/yrs)-1, launch_off_vs_ask=pl_a_/mid-1, retail_g=pf_c_/pl_c_-1, office_g=pf_a_/pl_a_-1, retail_avg_g=ap_c_/pl_c_-1, office_avg_g=ap_a_/pl_a_-1, blended=A['appr']-1)
+
+    if T == 125:
+        ok = 'LA' if k == 'GS' else 'GS'; Io = INFO[ok]; bo = series(ok); pk_o = float(bo['cum'].min())
+        comb = {}
+        for nm, kw in scen_defs().items():
+            ss, so = series(k, **kw), series(ok, **kw); cum = ss['cum'] + so['cum']; i = int(cum.argmin())
+            comb[nm] = dict(self_peak=float(ss['cum'].min()), other_peak=float(so['cum'].min()), comb_peak=float(cum.min()), comb_peak_m=int(MONTHS[i]), net=float((ss['net']+so['net']).sum()), npv=npv(ss['net']+so['net']), self_at_peak=float(ss['cum'][i]), other_at_peak=float(so['cum'][i]),
+                            other_npv=npv(so['net']), other_net=float(so['net'].sum()))
+        cc = b['cum'] + bo['cum']; i = int(cc.argmin()); dn = series(k, price=0.9, delay_q=4); jd = int(dn['cum'].argmin())
+        D['combined'] = dict(other_k=ok, other=dict(Io, k=ok), months=MONTHS[:43].tolist(), self_cum=b['cum'][:43].tolist(), other_cum=bo['cum'][:43].tolist(), comb_cum=cc[:43].tolist(), comb_min=float(cc.min()), comb_min_m=int(MONTHS[i]),
+                             other_net_series=bo['net'].tolist(), other_base=dict(coll=float(bo['coll'].sum()), land=float(bo['land'].sum()), cost=float((bo['cons']+bo['comm']+bo['sga']).sum()), net=float(bo['net'].sum()), npv=npv(bo['net']), peak=pk_o, peak_m=int(MONTHS[bo['cum'].argmin()])),
+                             scen=comb, own_dn_peak_m=int(MONTHS[jd]), other_base_cum_at_own_dn_peak=float(bo['cum'][jd]), comb_pos_month=int(MONTHS[[j for j in range(len(cc)) if cc[j] > 0 and j >= i][0]]),
+                             other_scen_series={nm: series(ok, **kw)['net'].tolist() for nm, kw in scen_defs().items()})
     return D
 if __name__ == '__main__':
     D = build('GS', 100)
