@@ -15,14 +15,14 @@ def cod_q(r):                            # monthly cols: month m -> column m+3 ;
     return out
 d = {'quarters_month': Q}
 for key, (rc, rl, rcost, rcons, rcom, rsga, sheet, drow) in {
-    'GS': (4, 11, 32, 28, 34, 40, 'Green Square', (35, 36)),
-    'LA': (5, 12, 33, 29, 35, 41, "L'avenir", (35, 36))}.items():
+    'GS': (4, 10, 28, 28, 33, 38, 'Green Square', (35, 36)),
+    'LA': (5, 11, 29, 29, 34, 39, "L'avenir", (35, 36))}.items():
     ws = v[sheet]
     # delivery-payment component of collections (sheet columns E.. = M3..), EGP thousand -> M
     deliv = [sum(float(ws.cell(r, 5+i).value or 0) for r in drow)/1000 for i in range(N)]
     d[key] = dict(collections=row(ncf, rc), landlord=row(ncf, rl), cost_total=row(ncf, rcost),
                   construction=cod_q(rcons), commission=cod_q(rcom), sga=cod_q(rsga), delivery_pay=deliv,
-                  net=row(ncf, rc+42))
+                  net=row(ncf, rc+36))
     # sheet-level facts
     d[key]['facts'] = {'price_comm': [ws.cell(3, c).value for c in range(5, 21)],
                        'price_admin': [ws.cell(4, c).value for c in range(5, 21)],

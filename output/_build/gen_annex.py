@@ -52,7 +52,7 @@ def make_annex(k, T, path):
     inp('B_mult', 'Option B: total cash return multiple', M_B2, 'x', 'Offer term (Option B)', X)
     inp('grace', 'Option B: grace period', GRACE_M, 'months', 'Offer term', '0')
     inp('n_pay', 'Option B: number of quarterly payouts', PAY_Q, 'quarters', 'Offer term (3 years)', '0')
-    inp('t0', 'Investor funding month (t0)', p['t0'], 'month', f"ASSUMPTION: month the down payment falls due in the model ('Net Cash Flow -With DP' row {11 if k=='GS' else 12})", '0')
+    inp('t0', 'Investor funding month (t0)', p['t0'], 'month', f"ASSUMPTION: month the down payment falls due in the model ('Net Cash Flow -With DP' row {10 if k=='GS' else 11})", '0')
     inp('handover', 'Project handover month', I['delivery'], 'month', f"Source model, {name} Summary!E4", '0')
     inp('disc', 'Discount rate', 0.14, '% p.a.', "Source model, sales sheet cell C72 (labelled Cost Of Capital); kept at 14% by Jalour", PC)
     inp('fric', 'Option A: investor resale friction', FRICTION, '%', 'ASSUMPTION: broker plus developer transfer fee', PC)
@@ -63,7 +63,7 @@ def make_annex(k, T, path):
     inp('dp', 'Down payment to landlord (10% of guarantee)', p['dp'], 'EGP m', 'Offers DP!C9' if k == 'GS' else 'Offers DP!D9', N1)
     inp('list100', 'Total sales value at 100% of units', p['list100'], 'EGP m', 'Summary C27 (sold 80% plus retained 20% at modelled prices)', N1)
     inp('comm_rate', 'Sales commission rate', COMM, '%', 'Summary B19', PC)
-    inp('prof_fee', 'Professional fees (% of construction cost)', 0.05, '%', "Cash Out Detail!C53", PC)
+    inp('prof_fee', 'Professional fees (% of construction cost)', 0.05, '%', "Cash Out Detail!C49", PC)
     inp('precon_share', 'Share of professional fees incurred before construction start', 0.30, '%', 'ASSUMPTION: the model has no pre-construction cost; to be confirmed', PC)
     sec('Launch price list and tranche values (source model sales sheet)')
     inp('pl_c', 'Launch list price, retail', Lh['p0'][0], 'EGP k / m2', 'First sales column, row 3', '#,##0')
@@ -84,12 +84,12 @@ def make_annex(k, T, path):
     inp('gate', 'Coverage test threshold', 1.5, 'x', 'Brief', X)
     sec('Reference values from the source model (for reconciliation only)')
     m = PD.MODEL_REF[k]
-    inp('ref_net', 'Jalour net cash flow, nominal', m['net'], 'EGP m', "'Net Cash Flow -With DP'!C46" if k == 'GS' else "'Net Cash Flow -With DP'!C47", '#,##0.000000')
-    inp('ref_npv', 'NPV of net cash flow with down payment', m['npv'], 'EGP m', 'Summary!D10' if k == 'GS' else 'Summary!D11', '#,##0.000000')
+    inp('ref_net', 'Jalour net cash flow, nominal', m['net'], 'EGP m', "'Net Cash Flow -With DP'!C40" if k == 'GS' else "'Net Cash Flow -With DP'!C41", '#,##0.000000')
+    inp('ref_npv', 'NPV of net cash flow with down payment', m['npv'], 'EGP m', 'Summary!D9' if k == 'GS' else 'Summary!D10', '#,##0.000000')
     inp('ref_peak', 'Peak cumulative cash shortage', m['peak'], 'EGP m', f"{name} Summary!E7", '#,##0.000000')
     inp('ref_coll', 'Total collections (80% of units sold)', m['coll'], 'EGP m', "'Net Cash Flow -With DP'!C4" if k == 'GS' else "'Net Cash Flow -With DP'!C5", '#,##0.000000')
-    inp('ref_land', 'Total landlord payments', m['land'], 'EGP m', "'Net Cash Flow -With DP'!C11" if k == 'GS' else "'Net Cash Flow -With DP'!C12", '#,##0.000000')
-    inp('ref_cost', 'Total construction, commission and SG&A', m['cost'], 'EGP m', "'Net Cash Flow -With DP'!C32" if k == 'GS' else "'Net Cash Flow -With DP'!C33", '#,##0.000000')
+    inp('ref_land', 'Total landlord payments', m['land'], 'EGP m', "'Net Cash Flow -With DP'!C10" if k == 'GS' else "'Net Cash Flow -With DP'!C11", '#,##0.000000')
+    inp('ref_cost', 'Total construction, commission and SG&A', m['cost'], 'EGP m', "'Net Cash Flow -With DP'!C28" if k == 'GS' else "'Net Cash Flow -With DP'!C29", '#,##0.000000')
     inp('usd', 'USD exchange rate (executive summary only)', 48.0, 'EGP per USD', 'Brief / model', '0.00')
     for col, w in zip('ABCD', (66, 16, 14, 100)): wsI.column_dimensions[col].width = w
     R = lambda key: ref[key]
@@ -103,11 +103,11 @@ def make_annex(k, T, path):
     hdr(wsS, 4, ['Series', 'Source cell / basis', 'Total'] + [''] * NQ_)
     S = {}
     srows = [('idx', 'Quarter index', 'structural'), ('month', 'Month', '3 x index'), ('coll_ex', 'Collections excluding delivery payments', "Net Cash Flow -With DP row %d less delivery component" % (4 if k == 'GS' else 5)),
-             ('deliv', 'Delivery payments (within collections)', f"{name} sheet rows 35-36"), ('sched', 'Landlord payments: down payment and guarantee schedule', f"Net Cash Flow -With DP row {11 if k=='GS' else 12}, schedule part"),
+             ('deliv', 'Delivery payments (within collections)', f"{name} sheet rows 35-36"), ('sched', 'Landlord payments: down payment and guarantee schedule', f"Net Cash Flow -With DP row {10 if k=='GS' else 11}, schedule part"),
              ('exc', 'Landlord payments: excess over guarantee (years 8+)', 'Same row, excess settlement'), ('cons', 'Construction cost', 'Cash Out Detail row %d' % (28 if k == 'GS' else 29)),
-             ('comm', 'Sales commission', 'Cash Out Detail row %d' % (34 if k == 'GS' else 35)), ('sga', 'SG&A and others (15% of construction)', 'Cash Out Detail row %d' % (40 if k == 'GS' else 41)),
+             ('comm', 'Sales commission', 'Cash Out Detail row %d' % (33 if k == 'GS' else 34)), ('sga', 'SG&A and others (15% of construction)', 'Cash Out Detail row %d' % (38 if k == 'GS' else 39)),
              ('lf_all', 'Launch tranches: collections, retail and offices', f"{name} sheet rows 31-36, 38-69 for the first two sales tranches"), ('lf_c', 'Launch tranches: collections, retail', 'same, commercial rows'), ('lf_a', 'Launch tranches: collections, offices', 'same, admin rows'),
-             ('lsv', 'Launch tranches: sales value at the quarter commission is paid (12 months after sale)', 'Cash Out Detail row 34 timing')]
+             ('lsv', 'Launch tranches: sales value at the quarter commission is paid (12 months after sale)', 'Cash Out Detail row 33 timing')]
     coll_ex = (b['coll'] - pad(E.D[k]['delivery_pay'])); deliv = pad(E.D[k]['delivery_pay'])
     lsv = np.zeros(NQ)
     for t in Lh['tr']:
