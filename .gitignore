@@ -1,0 +1,6 @@
+output/_build/node/
+__pycache__/
+*.pyc
+*.tmp
+output/*.zip
+*.md
