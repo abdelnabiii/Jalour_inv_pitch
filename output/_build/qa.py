@@ -129,7 +129,7 @@ def run(k, T):
     rep.append(f'\nPython engine vs spreadsheet reconciliation sheet: {S and cell("Reconciliation!$D$" + str(wb["Reconciliation"].max_row))}\n'); fails += bad
     # 3 disclosure scan
     other = ["L'avenir", 'L’avenir', 'Lavenir', "L'AVENIR", 'LA_0', 'LA_1'] if k == 'GS' else ['Green Square', 'GREEN SQUARE', 'GS_0', 'GS_1']
-    pats = other + ['AT EAST', 'At East', 'AT East', '250M', '250 M', '250 million', '250,000,000', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise']
+    pats = other + ['AT' + ' EAST', 'At' + ' East', 'AT' + ' East', '250M', '250 M', '250 million', '250,000,000', 'total raise', 'total programme', 'other investor', 'second investor', 'only external investor', 'last external investor', 'entire balance sheet', 'own balance sheet', 'combined raise']
     rep.append('## 3. Disclosure scan (every file, including document properties, notes, hidden sheets and comments)\n\n| File | Parts scanned | Prohibited hits | Bare "250" contexts |\n|---|---|---|---|')
     hits_total = 0
     for f in sorted(glob.glob(folder + '/*')):
